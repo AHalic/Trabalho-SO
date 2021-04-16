@@ -1,6 +1,6 @@
 # Arquivos de c
 *.out
-*.h
+*.o
 
 # Arquivos compactados
 *.zip
