@@ -1,0 +1,8 @@
+# Arquivos de c
+*.out
+*.h
+
+# Arquivos compactados
+*.zip
+*.tar*
+
