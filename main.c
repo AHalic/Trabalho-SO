@@ -26,17 +26,16 @@ int main() {
     int line_count = 0;
 
     // ler primeira linha fora do loop
-    show_command_line();
-    getline(&line_buf, &line_buf_size, stdin);
-
-    // Retirando o caracter \n ou \r do fim da string (lido pelo getline)
-    line_buf[strcspn(line_buf, "\r\n")] = 0; 
-
-    while (strcmp(line_buf, "armageddon") != 0) {
+    do
+    {
         show_command_line();
-        getline(&line_buf, &line_buf_size, stdin);        
+        getline(&line_buf, &line_buf_size, stdin);
+
+        // Retirando o caracter \n ou \r do fim da string (lido pelo getline)
         line_buf[strcspn(line_buf, "\r\n")] = 0; 
-    }
+        // printf("%s\n", line_buf);
+    } while (strcmp(line_buf, "armageddon"));
+    
     
     free(line_buf);
 
