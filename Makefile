@@ -1,7 +1,7 @@
 # Grupo: 
 # Beatriz Matias Santana Maia: 2019107651
 # Luana: 
-# Sophie Dilhon Gama: 
+# Sophie Dilhon Gama: 2019107591
 
 CC		:= gcc
 CFLAGS	:= 
