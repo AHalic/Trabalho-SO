@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include "vsh_errors.h"
 
 void show_command_line() {
     printf("vsh > ");
@@ -68,54 +69,41 @@ char** read_command_line(int* n_process) {
     return commands_vector;
 }
 
-void execute_command(char* command){
+void execute_command(char* command, int type){
     char* token = strtok(command, " ");
     char* exec = token;
     // printf("exec %s %s %s\n", exec, command, token);
     char** argv = (char**) malloc (sizeof(char*) * 4);
-    argv[0] = "bg"; // parametro de rodar em background
-    // mas esse de cima é so qnd tem mais de um processo F
+
+    if (!type) 
+        argv[0] = "fg"; // parametro de rodar em foreground
+    else
+        argv[0] = "bg"; // parametro de rodar em background
+
     int i = 1; 
 
-    while (token) {
+    while (i < 4) {
         char* token = strtok(NULL, " ");
         if (!token) {
-            // eu n sei pq sem esse if tava dando errado
-            // printf("sou null\n");
             break;
-        }
-        
-        else {
-            argv[i] = token;
-            // printf("%s", argv[i]);
+        } else {
+            argv[i++] = token;
         }
         
     }
 
-    
-    
-    
-    // do
-    // {
-        
-    //     argv[++i] = strtok(NULL, " ");
-    //     if (argv == NULL)
-    //     {
-    //         printf("oie sou null\n");
-    //         return;
-    //     }
-    //     printf("argv %s\n", argv[i]);
-    // } while (argv[i] != NULL);
-    
-    // printf("%s %s\n", exec, argv);
     int pid = fork();
     if(!pid)
-        if(execvp(exec, argv) == -1)
-            printf("nao foi exec\n");
+        if(execvp(exec, argv) == -1){
+            error_execvp();
+            exit(1);
+        }
 
-    // Espera o filho terminar para continuar
-    int wstatus;
-    waitpid(pid, &wstatus, WUNTRACED);
+    // Espera o filho terminar para continuar se for fg
+    if(!type){
+        int wstatus;
+        waitpid(pid, &wstatus, WUNTRACED);
+    }
 
 
     return;
