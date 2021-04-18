@@ -1,5 +1,8 @@
 #include "vsh_io.h"
+
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void show_command_line() {
     printf("vsh > ");
