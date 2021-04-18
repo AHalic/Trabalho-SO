@@ -1,5 +1,6 @@
 #include "vsh_io.h"
 #include <stdio.h>
+#include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -60,7 +61,7 @@ char** read_command_line(int* n_process) {
         commands_vector[aux_i++] = command;
     }
 
-    free(line_buf);
+    // free(line_buf);
 
     return commands_vector;
 }
@@ -68,23 +69,26 @@ char** read_command_line(int* n_process) {
 void execute_command(char* command){
     char* token = strtok(command, " ");
     char* exec = token;
-    printf("exec %s %s %s\n", exec, command, token);
-    char** argv;
-    int i = 0; 
+    // printf("exec %s %s %s\n", exec, command, token);
+    char** argv = (char**) malloc (sizeof(char*) * 4);
+    argv[0] = "bg"; // parametro de rodar em background
+    int i = 1; 
 
     while (token) {
         char* token = strtok(NULL, " ");
         if (!token) {
-            printf("sou null\n");
+            // eu n sei pq sem esse if tava dando errado
+            // printf("sou null\n");
             break;
         }
         
         else {
             argv[i] = token;
-            printf("%s", argv[i]);
+            // printf("%s", argv[i]);
         }
         
     }
+
     
     
     
@@ -100,8 +104,10 @@ void execute_command(char* command){
     //     printf("argv %s\n", argv[i]);
     // } while (argv[i] != NULL);
     
-    printf("cade eu %s\n", command);
-    execvp(exec, argv);
+    // printf("%s %s\n", exec, argv);
+    if(!fork())
+        if(execvp(exec, argv) == -1)
+            printf("nao foi exec\n");
 
     return;
 }
