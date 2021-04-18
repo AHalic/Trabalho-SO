@@ -15,21 +15,27 @@ int main(int argc, char* argv[]) {
     // Configura a mascara de sinais bloqueados (SIGINT)
     // configure_mask();
 
-    char** commands_vector;
-    int n_arguments = 0;
+    int n_commands = 0;
 
     // ler primeira linha antes do loop
     do {
         show_command_line();
-        commands_vector = read_command_line(&n_arguments);
+        char** commands_vector = read_command_line(&n_commands);
 
-        if (n_arguments == 0) continue;
+        if (n_commands == 0) continue;
 
-        if (quit_shell(commands_vector[0])) return 0;
-        
-        for (int i = 0; i < n_arguments; i++) {
-            execute_command(commands_vector[i], n_arguments-1);
+        if (quit_shell(commands_vector[0])) {
+            free(commands_vector);
+            return 0;
         }
+        
+        for (int i = 0; i < n_commands; i++) {
+            execute_command(commands_vector[i], n_commands-1);
+        }
+        
+        destroy_commands(commands_vector, n_commands);
 
     } while (true);
+
+    
 }
