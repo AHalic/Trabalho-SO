@@ -7,7 +7,7 @@ CC		:= gcc
 CFLAGS	:= 
 
 BIN		:= bin
-SRC		:= .
+SRC		:= src
 INCLUDE	:= src
 
 EXECUTABLE	:= vsh
