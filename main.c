@@ -12,16 +12,16 @@
 
 int main() {
     // Configura a mascara de sinais bloqueados (SIGINT)
-    sigset_t shell_mask;
-    sigemptyset(&shell_mask);
-    sigaddset(&shell_mask, SIGINT);
-    sigprocmask(SIG_SETMASK, &shell_mask, NULL);
+    // sigset_t shell_mask;
+    // sigemptyset(&shell_mask);
+    // sigaddset(&shell_mask, SIGINT);
+    // sigprocmask(SIG_SETMASK, &shell_mask, NULL);
 
     //le o resto do arquivo e retorna n
     // char* line_buf = NULL, *exec, *args, *process1, *process2;
     char** processes;
     // size_t line_buf_size = 0;
-    int n_arguments;
+    int n_arguments = 0;
 
     // ler primeira linha fora do loop
     do {
@@ -30,10 +30,17 @@ int main() {
 
         if (n_arguments == 0) continue;
 
+        if (!strcmp(processes[0], "armageddon"))
+            return 0;
+        
+        
         printf("Number of arguments: %d\n", n_arguments);
         for (int i = 0; i < n_arguments; i++) {
             printf("command: %s\n", processes[i]);
+            execute_command(processes[i]);
         }
+
+
         // getline(&line_buf, &line_buf_size, stdin);
 
         // Retirando o caracter \n ou \r do fim da string (lido pelo getline)
@@ -55,7 +62,7 @@ int main() {
         // printf("os args são |%s|\n", args);
         // printf("O proximo processo eh |%s|\n", process2);
     // } while (strcmp(line_buf, "armageddon") && !feof(stdin));
-    } while (strcmp(processes[0], "armageddon") && !feof(stdin));
+    } while (1);
 }
 
 /*
