@@ -4,8 +4,8 @@
 #include <signal.h>
 #include <unistd.h>
 
-#include "./src/vsh_io.c"
-#include "./src/vsh_handler.c"
+#include "vsh_io.h"
+#include "vsh_handler.h"
 
 #define true 1
 #define false 0
@@ -34,9 +34,9 @@ int main() {
             return 0;
         
         
-        printf("Number of arguments: %d\n", n_arguments);
+        // printf("Number of arguments: %d\n", n_arguments);
         for (int i = 0; i < n_arguments; i++) {
-            printf("command: %s\n", processes[i]);
+            // printf("command: %s\n", processes[i]);
             execute_command(processes[i]);
         }
 

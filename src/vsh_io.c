@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 void show_command_line() {
     printf("vsh > ");
@@ -72,6 +74,7 @@ void execute_command(char* command){
     // printf("exec %s %s %s\n", exec, command, token);
     char** argv = (char**) malloc (sizeof(char*) * 4);
     argv[0] = "bg"; // parametro de rodar em background
+    // mas esse de cima é so qnd tem mais de um processo F
     int i = 1; 
 
     while (token) {
@@ -105,9 +108,15 @@ void execute_command(char* command){
     // } while (argv[i] != NULL);
     
     // printf("%s %s\n", exec, argv);
-    if(!fork())
+    int pid = fork();
+    if(!pid)
         if(execvp(exec, argv) == -1)
             printf("nao foi exec\n");
+
+    // Espera o filho terminar para continuar
+    int wstatus;
+    waitpid(pid, &wstatus, WUNTRACED);
+
 
     return;
 }
