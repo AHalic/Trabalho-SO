@@ -7,7 +7,7 @@ CC		:= gcc
 CFLAGS	:= 
 
 BIN		:= bin
-SRC		:= src
+SRC		:= .
 INCLUDE	:= src
 
 EXECUTABLE	:= vsh
@@ -26,10 +26,13 @@ all: clean $(EXECUTABLE)
 clean:
 	-$(RM) $(OBJECTS)
 
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(CFLAGS) $(CINCLUDES) $^ -o $@ $(LIBRARIES)
+
 # Comandos para executar
 run: 
-	# ./$(EXECUTABLE) 
+	./$(EXECUTABLE) 
 
 # Comandos para executar com valgrind
 val: 
-	# valgrind ./$(EXECUTABLE) 
+	valgrind ./$(EXECUTABLE) 
