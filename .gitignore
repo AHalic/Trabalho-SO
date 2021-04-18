@@ -1,6 +1,7 @@
 # Arquivos de c
 *.out
 *.o
+vsh
 
 # Arquivos compactados
 *.zip
