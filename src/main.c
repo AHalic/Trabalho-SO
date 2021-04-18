@@ -33,35 +33,10 @@ int main() {
         if (!strcmp(processes[0], "armageddon"))
             return 0;
         
-        
-        // printf("Number of arguments: %d\n", n_arguments);
         for (int i = 0; i < n_arguments; i++) {
             // printf("command: %s\n", processes[i]);
-            execute_command(processes[i]);
+            execute_command(processes[i], n_arguments-1);
         }
-
-
-        // getline(&line_buf, &line_buf_size, stdin);
-
-        // Retirando o caracter \n ou \r do fim da string (lido pelo getline)
-        // exec = strdup(line_buf);
-        // line_buf[strcspn(line_buf, "\r\n")] = 0; 
-        // printf("A linha lida é %s\n", line_buf);
-        
-        // process1 = strtok(line_buf, "|");
-        // printf("A linha lida é %s\n", line_buf);
-
-        // printf("A linha lida é %s\n", exec);
-        // // printf("Os processos são: %s\n", process1);
-        // process2 = strtok(NULL, "|");
-
-        // exec = strtok(process1, " ");
-        // args = strtok(NULL, "\0");
-
-        // printf("o executavel é %s\n", exec);
-        // printf("os args são |%s|\n", args);
-        // printf("O proximo processo eh |%s|\n", process2);
-    // } while (strcmp(line_buf, "armageddon") && !feof(stdin));
     } while (1);
 }
 
