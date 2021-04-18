@@ -17,6 +17,7 @@ static int n_process_counter(char* line_buf) {
 
     int n_process = 1;
     
+    // ler a quantidade de pipes
     for (int i = 0; i < strlen(line_buf); i++) {
         if(!strncmp(&line_buf[i], "|", 1))
             n_process++;
@@ -62,37 +63,4 @@ char** read_command_line(int* n_process) {
     }
 
     return commands_vector;
-}
-
-void execute_command(char* command, int type){
-    char* token = strtok(command, " ");
-    char* exec = token;
-    char** argv = (char**) malloc (sizeof(char*) * 4); // free
-
-    argv[0] = exec;
-    int i = 1; 
-
-    while (i < 4) {
-        char* token = strtok(NULL, " ");
-        if (!token) {
-            break;
-        } else {
-            argv[i++] = token;
-        }   
-    }
-
-    int pid = fork();
-    if(!pid)
-        if(execvp(exec, argv) == -1){
-            error_execvp();
-            free(argv);
-            exit(1);
-        }
-
-    // Espera o filho terminar para continuar se for fg
-    if(!type){
-        int wstatus;
-        waitpid(pid, &wstatus, WUNTRACED);
-    }
-    free(argv);
 }

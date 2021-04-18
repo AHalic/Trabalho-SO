@@ -5,6 +5,4 @@ void show_command_line();
 
 char** read_command_line(int* n_process);
 
-void execute_command(char* command, int type);
-
 #endif
