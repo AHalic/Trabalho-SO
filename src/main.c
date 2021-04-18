@@ -10,7 +10,8 @@
 #define true 1
 #define false 0
 
-int main() {
+int main(int argc, char* argv[]) {
+    // printf("arg0: %s\n\n", argv[0]);
     // Configura a mascara de sinais bloqueados (SIGINT)
     // sigset_t shell_mask;
     // sigemptyset(&shell_mask);
