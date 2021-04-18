@@ -35,4 +35,4 @@ run:
 
 # Comandos para executar com valgrind
 val: 
-	valgrind ./$(EXECUTABLE) 
+	valgrind --leak-check=full ./$(EXECUTABLE) 
