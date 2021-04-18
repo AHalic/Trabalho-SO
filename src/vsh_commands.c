@@ -12,17 +12,20 @@ void configure_mask() {
     sigset_t shell_mask;
     sigemptyset(&shell_mask);
     sigaddset(&shell_mask, SIGINT);
+    sigaddset(&shell_mask, SIGSTOP);
     sigprocmask(SIG_SETMASK, &shell_mask, NULL);
 }
 
 static void execute_command_child (char* exec, char** argv, int bg) {
     // chama filho para processo
+    if (quit_shell(exec)) exit(0);
+
     int pid = fork();
     if(!pid)
         if(execvp(exec, argv) == -1){
-            error_execvp();
+            int error = error_execvp();
             free(argv);
-            exit(1);
+            exit(error);
         }
 
     // Espera o filho terminar para continuar se for fg
@@ -30,10 +33,9 @@ static void execute_command_child (char* exec, char** argv, int bg) {
         int wstatus;
         waitpid(pid, &wstatus, WUNTRACED);
     }
-   
 }
 
-void execute_command(char* command, int bg){
+void execute_command(char* command, int bg) {
     char* token = strtok(command, " ");
     char* exec = token;
     char** argv = (char**) malloc (sizeof(char*) * 4); 
@@ -51,13 +53,25 @@ void execute_command(char* command, int bg){
             argv[i++] = token;
         }   
     }
+    argv[i] = NULL;
 
     execute_command_child(exec, argv, bg);
     free(argv);
 }
 
 int quit_shell(char* command) {
-    if (!strcmp(command, "armageddon"))
+    // Ve se existe a substring armageddon
+    if (strstr(command, "armageddon")) {
+        free(command);
         return 1;
+    }
+
     return 0;
+}
+
+void destroy_commands(char** commands, int n_commands) {
+    for (int i = 0; i < n_commands; i++) {
+        free(commands[i]);
+    }
+    free(commands);
 }

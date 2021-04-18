@@ -7,4 +7,6 @@ void execute_command(char* command, int bg);
 
 int quit_shell(char* command);
 
+void destroy_commands(char** commands, int n_commands);
+
 #endif
