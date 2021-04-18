@@ -26,26 +26,23 @@ static int n_process_counter(char* line_buf) {
 }
 
 char** read_command_line(int* n_process) {
-    char* line_buf = NULL, *aux;
+    char* line_buf = NULL;
     size_t line_buf_size = 0;
-    // printf("\n");
 
     // lendo linha de comando
     getline(&line_buf, &line_buf_size, stdin);
 
     // retirando o caracter \n ou \r do fim da string (lido pelo getline)
     line_buf[strcspn(line_buf, "\r\n")] = 0; 
-    // printf("comando %s.\n", line_buf);    
 
     *n_process = n_process_counter(line_buf);
-    // printf("%d\n", *n_process);
 
     // se nao tem processo, retorna NULL
     if (*n_process == 0) return NULL;
 
 
     // aloca espaco para comandos
-    char** commands_vector = (char**) malloc (sizeof(char*) * (*n_process));
+    char** commands_vector = (char**) malloc (sizeof(char*) * (*n_process));  // free
     int aux_i = 0;
 
     
@@ -64,22 +61,15 @@ char** read_command_line(int* n_process) {
         commands_vector[aux_i++] = command;
     }
 
-    // free(line_buf);
-
     return commands_vector;
 }
 
 void execute_command(char* command, int type){
     char* token = strtok(command, " ");
     char* exec = token;
-    // printf("exec %s %s %s\n", exec, command, token);
-    char** argv = (char**) malloc (sizeof(char*) * 4);
+    char** argv = (char**) malloc (sizeof(char*) * 4); // free
 
-    if (!type) 
-        argv[0] = "fg"; // parametro de rodar em foreground
-    else
-        argv[0] = "bg"; // parametro de rodar em background
-
+    argv[0] = exec;
     int i = 1; 
 
     while (i < 4) {
@@ -88,14 +78,14 @@ void execute_command(char* command, int type){
             break;
         } else {
             argv[i++] = token;
-        }
-        
+        }   
     }
 
     int pid = fork();
     if(!pid)
         if(execvp(exec, argv) == -1){
             error_execvp();
+            free(argv);
             exit(1);
         }
 
@@ -104,7 +94,5 @@ void execute_command(char* command, int type){
         int wstatus;
         waitpid(pid, &wstatus, WUNTRACED);
     }
-
-
-    return;
+    free(argv);
 }
