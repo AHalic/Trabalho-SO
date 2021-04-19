@@ -1,7 +1,7 @@
 #ifndef VSH_ERRORS_H
 #define VSH_ERRORS_H
 
-void error_execvp();
+int error_execvp();
 
 void error_pipe();
 

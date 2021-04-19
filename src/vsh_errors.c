@@ -1,8 +1,14 @@
 #include "vsh_errors.h"
 #include <stdio.h>
+/**
+ * CODIGO DE ERROS
+ * 101 - error execvp
+ * 
+ */
 
-void error_execvp() {
+int error_execvp() {
     perror("Wasn't able to execute the execvp ");
+    return 101;
 }
 
 void error_pipe() {
