@@ -3,4 +3,6 @@
 
 void error_execvp();
 
+void error_pipe();
+
 #endif
