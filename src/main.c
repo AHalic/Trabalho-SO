@@ -31,20 +31,24 @@ int main(int argc, char* argv[]) {
         }
         
 
-        // TODO: Criar função disso
-        int fd[n_commands - 1][2];
         if (n_commands > 1) {
-            for (int i = 0; i < n_commands - 1; i++)
-            {
-                if(pipe(fd[i]) == -1)
-                    error_pipe();
-            }
-            
+            int fd[n_commands - 1][2];
+            open_pipe(n_commands, fd);
+            for (int i = 0; i < n_commands; i++)
+                execute_command(commands_vector[i], n_commands-1, fd, i);   
         }
+        else 
+            execute_command(commands_vector[0], n_commands-1, NULL, 0);
+
+        
              
-        for (int i = 0; i < n_commands; i++) {
-            execute_command(commands_vector[i], n_commands-1);
-        }
+        // for (int i = 0; i < n_commands; i++) {
+        //     if (n_commands == 1) {
+        //         execute_command(commands_vector[i], n_commands-1, NULL, i);
+        //     }
+        //     else
+        //         execute_command(commands_vector[i], n_commands-1, fd, i);
+        // }
         
         destroy_commands(commands_vector, n_commands);
 

@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "vsh_errors.h"
@@ -16,9 +17,7 @@ void configure_mask() {
     sigprocmask(SIG_SETMASK, &shell_mask, NULL);
 }
 
-static void execute_command_child (char* exec, char** argv, int bg) {
-    // chama filho para processo
-    if (quit_shell(exec)) exit(0);
+static void execute_command_child_fg (char* exec, char** argv) {
 
     int pid = fork();
     if(!pid)
@@ -28,14 +27,41 @@ static void execute_command_child (char* exec, char** argv, int bg) {
             exit(error);
         }
 
-    // Espera o filho terminar para continuar se for fg
-    if(!bg){
-        int wstatus;
-        waitpid(pid, &wstatus, WUNTRACED);
-    }
+    // Espera o filho terminar para continuar 
+    int wstatus;
+    waitpid(pid, &wstatus, WUNTRACED);
 }
 
-void execute_command(char* command, int bg) {
+static void execute_command_child_bg(char* exec, char** argv, int pos, int n_com, int fd[n_com][2]){
+    
+    int pid = fork();
+    if(!pid) {
+        // TODO: dar close nos pipes n usados
+        if (!pos) {
+            close(1);
+            dup(fd[0][1]);
+        }
+        else if (pos == n_com) {
+            close(0);
+            dup(fd[pos-1][0]);
+        }
+        else {
+            close(0);
+            close(1);
+            dup(fd[pos-1][0]);
+            dup(fd[pos][1]);
+        }
+        
+        if(execvp(exec, argv) == -1){
+            int error = error_execvp();
+            free(argv);
+            exit(error);
+        }
+    }
+
+}
+
+void execute_command(char* command, int bg, int fd[bg+1][2], int pos) {
     char* token = strtok(command, " ");
     char* exec = token;
     char** argv = (char**) malloc (sizeof(char*) * 4); 
@@ -55,7 +81,13 @@ void execute_command(char* command, int bg) {
     }
     argv[i] = NULL;
 
-    execute_command_child(exec, argv, bg);
+    if (quit_shell(exec)) exit(0);
+
+    if(!bg)
+        execute_command_child_fg(exec, argv);
+    else
+        execute_command_child_bg(exec, argv, pos, bg, fd);
+
     free(argv);
 }
 

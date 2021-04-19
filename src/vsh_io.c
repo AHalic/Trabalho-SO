@@ -67,3 +67,13 @@ char **read_command_line(int *n_process) {
     free(line_buf);
     return commands_vector;
 }
+
+void open_pipe(int n_commands, int fd[n_commands][2]) {
+    if (n_commands > 1) {
+        // int fd[n_commands - 1][2];
+        for (int i = 0; i < n_commands - 1; i++) {
+            if(pipe(fd[i]) == -1)
+                error_pipe();
+        }
+    }
+}
