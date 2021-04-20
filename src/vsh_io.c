@@ -55,7 +55,7 @@ char **read_command_line(int *n_process) {
     commands_vector[aux_i++] = command;
     
     // verifica se o commando token eh null
-    while (aux_command && (aux_i < 5 && *n_process < 5)) {
+    while (aux_command && (aux_i < 5 && *n_process <= 5)) {
         aux_command = strtok(NULL, "|");
 
         if(aux_command){
