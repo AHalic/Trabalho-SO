@@ -6,6 +6,8 @@
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+
+#include "vsh_io.h"
 #include "vsh_errors.h"
 
 void configure_mask() {
@@ -39,15 +41,21 @@ static void execute_command_child_bg(char* exec, char** argv, int pos, int n_com
         // TODO: dar close nos pipes n usados
         if (!pos) {
             close(1);
+            close_pipe(n_com, fd, 0, 1);
+            close_pipe(n_com, fd, n_com, 0);
             dup(fd[0][1]);
         }
         else if (pos == n_com) {
             close(0);
+            close_pipe(n_com, fd, n_com, 1);
+            close_pipe(n_com, fd, pos-1, 0);
             dup(fd[pos-1][0]);
         }
         else {
             close(0);
             close(1);
+            close_pipe(n_com, fd, pos, 1);
+            close_pipe(n_com, fd, pos-1, 0);
             dup(fd[pos-1][0]);
             dup(fd[pos][1]);
         }
@@ -61,7 +69,7 @@ static void execute_command_child_bg(char* exec, char** argv, int pos, int n_com
 
 }
 
-void execute_command(char* command, int bg, int fd[bg+1][2], int pos) {
+void execute_command(char* command, int bg, int fd[bg][2], int pos) {
     char* token = strtok(command, " ");
     char* exec = token;
     char** argv = (char**) malloc (sizeof(char*) * 4); 
@@ -81,6 +89,7 @@ void execute_command(char* command, int bg, int fd[bg+1][2], int pos) {
     }
     argv[i] = NULL;
 
+    // TODO: quando armageddon não é 1º da ruim
     if (quit_shell(exec)) exit(0);
 
     if(!bg)
@@ -94,7 +103,9 @@ void execute_command(char* command, int bg, int fd[bg+1][2], int pos) {
 int quit_shell(char* command) {
     // Ve se existe a substring armageddon
     if (strstr(command, "armageddon")) {
+        printf("ola\n");
         free(command);
+        printf("oi\n");
         return 1;
     }
 
