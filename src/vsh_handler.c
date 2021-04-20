@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-void handle_sigusr() {
+void handle_sigusr_vsh() {
     printf("\n"
             "              _  _\n"
             "    _ _      (0)(0)-._  _.-'^^'^^'^^'^^'^^'--.\n"
