@@ -45,7 +45,7 @@ char **read_command_line(int *n_process) {
         return NULL;
 
     // aloca espaco para comandos
-    char **commands_vector = (char **)malloc(sizeof(char *) * (*n_process+1)); // free
+    char **commands_vector = (char **)malloc(sizeof(char *) * (*n_process)); // free
     
     int aux_i = 0;
 

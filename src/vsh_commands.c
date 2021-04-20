@@ -71,7 +71,7 @@ static void execute_command_child_bg(char* exec, char** argv, int pos, int n_com
 
 void execute_command(char* command, int bg, int fd[bg][2], int pos) {
     char* token = strtok(command, " ");
-    char* exec = token;
+    char* exec = strdup(token);
     char** argv = (char**) malloc (sizeof(char*) * 4); 
 
     // primeiro argumento eh o executavel
@@ -103,9 +103,7 @@ void execute_command(char* command, int bg, int fd[bg][2], int pos) {
 int quit_shell(char* command) {
     // Ve se existe a substring armageddon
     if (strstr(command, "armageddon")) {
-        printf("ola\n");
         free(command);
-        printf("oi\n");
         return 1;
     }
 
