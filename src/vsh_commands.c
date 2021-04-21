@@ -16,6 +16,7 @@ void configure_mask() {
     sigemptyset(&shell_mask);
     sigaddset(&shell_mask, SIGINT);
     sigaddset(&shell_mask, SIGSTOP);
+    sigaddset)&shell_mask, SIGTSTP);
     sigprocmask(SIG_SETMASK, &shell_mask, NULL);
 }
 
