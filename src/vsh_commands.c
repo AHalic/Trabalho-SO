@@ -1,4 +1,5 @@
 #include "vsh_commands.h"
+
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -9,21 +10,27 @@
 
 #include "vsh_io.h"
 #include "vsh_errors.h"
+#include "vsh_handler.h"
 
-void configure_mask() {
+void configure_signals_vsh() {
     // Configura a mascara de sinais bloqueados (SIGINT)
-    sigset_t shell_mask;
-    sigemptyset(&shell_mask);
-    sigaddset(&shell_mask, SIGINT);
-    sigaddset(&shell_mask, SIGSTOP);
-    sigaddset)&shell_mask, SIGTSTP);
-    sigprocmask(SIG_SETMASK, &shell_mask, NULL);
+    struct sigaction sa_sigint, sa_sigquit, sa_sigtstp;
+    sa_sigint.sa_flags = sa_sigquit.sa_flags = sa_sigtstp.sa_flags = SA_RESTART;
+
+    sa_sigint.sa_handler = &handle_sigint;
+    sa_sigquit.sa_handler = &handle_sigquit;
+    sa_sigtstp.sa_handler = &handle_sigtstp;
+
+    sigaction(SIGINT, &sa_sigint, NULL);
+    sigaction(SIGQUIT, &sa_sigquit, NULL);
+    sigaction(SIGTSTP, &sa_sigtstp, NULL);
 }
 
 static void execute_command_child_fg (char* exec, char** argv) {
 
     int pid = fork();
     if(!pid)
+        // printf("PID: %d\n", getpid());
         if(execvp(exec, argv) == -1){
             int error = error_execvp();
             free(argv);
@@ -36,8 +43,13 @@ static void execute_command_child_fg (char* exec, char** argv) {
 }
 
 static void execute_command_child_bg(char* exec, char** argv, int pos, int n_com, int fd[n_com][2]){
-    
     int pid = fork();
+    if (pid == 0) {
+        printf("Child forked: %d\n", getpid());
+        signal(SIGUSR1, handle_sigusr_sick);
+        kill(getppid(), SIGUSR1);
+    }
+
     if(!pid) {
         // TODO: dar close nos pipes n usados
         if (!pos) {
