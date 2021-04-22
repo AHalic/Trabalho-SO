@@ -22,28 +22,30 @@ int execute_programs(int n_commands, char** commands_vector) {
     if ((command_line = fork()) == -1) return error_fork();
     
     // filho para auxiliar na chamada de processos
-    if(!command_line) {
+    if(!command_line && n_commands > 1) {
+        // background
+        setsid(); 
         // vejo quem eh pai e filho (pra poder ver se o pai n eh a shell e ver o pid do fork aux)
         printf("COMMAND LINE PID: %d, son of %d\n", getpid(), getppid()); 
 
         // sa.sa_handler = &handle_sigusr_vaccinated;
         // sigaction(SIGUSR1, &sa, NULL);
-        setsid(); // faz os processos dps serem tudo da msm sessao
-
-        pid_t pids[n_commands]; // usado pra guardar o pid dos filhos
-        pid_t pid; // aux pra pegar o pid
-
-        // se tem varios comandos 
-        if (n_commands > 1) {     
+ 
+            // faz os processos dps serem tudo da msm sessao
+            
+            // aux pra pegar o pid
+            pid_t pids[n_commands]; // usado pra guardar o pid dos filhos
+            pid_t pid; 
+            
             // atualiza o handler para os filhos lidarem com o SIGUSR1 da msm forma 
             signal(SIGUSR1, handle_sigusr_sick);
-    
+            // precisa ignorar SIGINT, SIGQUIT e SIGTSTP
+
             int fd[n_commands - 1][2];
             open_pipe(n_commands, fd);
             for (int i = 0; i < n_commands; i++) {
-                pid = execute_command(commands_vector[i], n_commands-1, fd, i);  
-                pids[i] = pid; 
-                printf("%d\n", pid);
+                pids[i] = execute_command(commands_vector[i], n_commands-1, fd, i);  
+                printf("%d\n", pids[i]);
             }
       
             close_pipe(n_commands-1, fd, n_commands, 0);
@@ -52,19 +54,78 @@ int execute_programs(int n_commands, char** commands_vector) {
             int status; // ver o status do pai com os filhos
             int signaledUsr = 0; // ver se foi sinalizado SIGUSR1 pro pai
 
-            // verifica se algum filho sinalizou SIGUSR1 
-            while ((pid = waitpid(-1, &status, WNOHANG)) > -1) {
-                // usado para verificar o termino dos filhos foi anormal 
+/*
+waitpid(-1, &wstatus, WUNTRACED);
+        if (WIFSIGNALED(wstatus)) {
+            printf("[PARENT]: Child returned with code %d.\n",
+                   WTERMSIG(wstatus)); // no mac 30, no linux 10
+        }
+        if (WIFSTOPPED(wstatus)) {
+            printf("[PARENT]: Child returned with code %d.\n",
+                   WSTOPSIG(wstatus)); // no mac 17, no linux 19
+        }
+
+    int counter = 0;
+    while (pid > 0) {
+        pid = waitpid(-1, &status, WNOHANG);
+        if (WIFSIGNALED(status)) {
+            printf("signaled %d\n", WTERMSIG(status));
+            // usa pra verificar se o filho terminou com sigusr1 (talvez seria legal n setar o handler do filho mas sim do pai)
+            if (WTERMSIG(status) == SIGUSR1) {
+                printf("signed sigusr1\n");
+                signaledUsr = 1; // alguem mandou sigusr 1
+                break;
+            } else if (WTERMSIG(status) == SIGCHILD)
+                counter++;
+        
+
+        if (counter == n_commands)
+            break;
+        // if()
+        //     printf("Meu filho pid=%d terminou\n", ok);
+        // else if (ok == 0)
+        //     printf("Nenhum filho terminou\n");
+        // else if (ok == -1)
+        //     break;
+    }
+
+*/
+
+
+
+            // // verifica se algum filho sinalizou SIGUSR1 
+            // while ((pid = waitpid(0, &status, WNOHANG)) > -1) {
+            //     // usado para verificar o termino dos filhos foi anormal 
+            //     if (WIFSIGNALED(status)) {
+            //         printf("signaled %d\n", WTERMSIG(status));
+            //         // usa pra verificar se o filho terminou com sigusr1 (talvez seria legal n setar o handler do filho mas sim do pai)
+            //         if (WTERMSIG(status) == SIGUSR1) {
+            //             printf("signed sigusr1\n");
+            //             signaledUsr = 1; // alguem mandou sigusr 1
+            //             break;
+            //         }
+            //     }
+            // }
+
+            int counter = 0;
+            while (1) {
+                if (pid = waitpid(0, &status, WNOHANG) < 0) printf("oi\n");
                 if (WIFSIGNALED(status)) {
+                    printf("signaled %d\n", WTERMSIG(status));
                     // usa pra verificar se o filho terminou com sigusr1 (talvez seria legal n setar o handler do filho mas sim do pai)
                     if (WTERMSIG(status) == SIGUSR1) {
                         printf("signed sigusr1\n");
                         signaledUsr = 1; // alguem mandou sigusr 1
                         break;
-                    }
+                    } else if (WTERMSIG(status) == SIGCHLD)
+                        counter++;
                 }
-            }
+
+                if (counter == n_commands)
+                    break;
             
+            }     
+
             // se alguem mandou o sigusr1
             if (signaledUsr) {
                 // manda sinal para todos os filhos (talvez eh estranho mandar pro filho q mandou usr1? 
@@ -73,23 +134,23 @@ int execute_programs(int n_commands, char** commands_vector) {
                 for (int i = 0; i < n_commands; i++) {
                     if (pids[i] != 0) {
                         printf("pid: %d\n", pids[i]);
-                        kill(pids[i], SIGUSR1);
+                        kill(pids[i], SIGTERM);
                     }
                 }
+                
                 printf("oi\n");
                 // manda pra shell a mensagem do jacare
-                signal(SIGUSR1, handle_sigusr_vsh);
-                kill(getppid(), SIGUSR1);        
             }
         }
-        else { 
-            pid = execute_command(commands_vector[0], n_commands-1, NULL, 0);
-        }
 
-    } else if (n_commands == 1) {
-        signal(SIGUSR1, SIG_IGN);
-        wait(NULL);
+        raise(SIGTERM);
     } 
+    else if (n_commands == 1) {
+        // foreground
+        signal(SIGUSR1, SIG_IGN);
+        pid_t pid = execute_command(commands_vector[0], n_commands-1, NULL, 0);
+        wait(NULL);
+    }
 }
 
 int main(int argc, char* argv[]) {
