@@ -3,6 +3,8 @@
 
 int error_execvp();
 
-void error_pipe();
+int error_pipe();
+
+int error_fork();
 
 #endif
