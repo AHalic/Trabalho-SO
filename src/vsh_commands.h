@@ -3,7 +3,7 @@
 
 void configure_signals_vsh();
 
-void execute_command(char* command, int bg, int fd[bg+1][2], int pos);
+int execute_command(char* command, int bg, int fd[bg+1][2], int pos);
 
 int quit_shell(char* command);
 

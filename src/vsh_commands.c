@@ -26,7 +26,7 @@ void configure_signals_vsh() {
     sigaction(SIGTSTP, &sa_sigtstp, NULL);
 }
 
-static void execute_command_child_fg (char* exec, char** argv) {
+static int execute_command_child_fg (char* exec, char** argv) {
 
     int pid = fork();
     if(!pid)
@@ -40,17 +40,19 @@ static void execute_command_child_fg (char* exec, char** argv) {
     // Espera o filho terminar para continuar 
     int wstatus;
     waitpid(pid, &wstatus, WUNTRACED);
+
+    if(!pid)
+        return getpid();
+    return pid;
 }
 
-static void execute_command_child_bg(char* exec, char** argv, int pos, int n_com, int fd[n_com][2]){
+static int execute_command_child_bg(char* exec, char** argv, int pos, int n_com, int fd[n_com][2]){
     int pid = fork();
-    if (pid == 0) {
-        printf("Child forked: %d\n", getpid());
-        signal(SIGUSR1, handle_sigusr_sick);
-        kill(getppid(), SIGUSR1);
-    }
-
+    
     if(!pid) {
+        printf("Child forked: %d Dad: %d\n", getpid(), getppid());
+        // raise(SIGUSR1); // tava usando para mandar o SIGUSR1
+        
         // TODO: dar close nos pipes n usados
         if (!pos) {
             close(1);
@@ -80,9 +82,12 @@ static void execute_command_child_bg(char* exec, char** argv, int pos, int n_com
         }
     }
 
+    if(!pid)
+        return getpid();
+    return pid;
 }
 
-void execute_command(char* command, int bg, int fd[bg][2], int pos) {
+int execute_command(char* command, int bg, int fd[bg][2], int pos) {
     char* token = strtok(command, " ");
     char* exec = strdup(token);
     char** argv = (char**) malloc (sizeof(char*) * 4); 
@@ -104,13 +109,14 @@ void execute_command(char* command, int bg, int fd[bg][2], int pos) {
 
     // TODO: quando armageddon não é 1º da ruim
     if (quit_shell(exec)) exit(0);
-
+    pid_t pid;
     if(!bg)
-        execute_command_child_fg(exec, argv);
+        pid = execute_command_child_fg(exec, argv);
     else
-        execute_command_child_bg(exec, argv, pos, bg, fd);
+        pid = execute_command_child_bg(exec, argv, pos, bg, fd);
 
     free(argv);
+    return pid;
 }
 
 int quit_shell(char* command) {
