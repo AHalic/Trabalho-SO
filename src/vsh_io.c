@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "vsh_errors.h"
+#include "vsh_commands.h"
 
 void show_command_line() {
     printf("vsh > ");
@@ -53,10 +54,12 @@ char **read_command_line(int *n_process) {
     char* line_buf = parseInput();
 
     *n_process = n_process_counter(line_buf);
-    
+
     // se nao tem processo, retorna NULL
     if (*n_process == 0 || line_buf == NULL)
         return NULL;
+
+    if (quit_shell(line_buf)) exit(0);
 
     // aloca espaco para comandos
     char **commands_vector = (char **)malloc(sizeof(char *) * (*n_process)); // free
