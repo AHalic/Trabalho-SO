@@ -13,7 +13,7 @@ void show_command_line() {
 
 static int n_process_counter(char *line_buf) {
     // conta a quantidade de processo na linha
-    if (line_buf == NULL)
+    if (line_buf == NULL || !strlen(line_buf))
         return 0;
 
     int n_process = 1;
@@ -28,20 +28,34 @@ static int n_process_counter(char *line_buf) {
     return n_process;
 }
 
-char **read_command_line(int *n_process) {
+static char* parseInput() {
     char *line_buf = NULL;
     size_t line_buf_size = 0;
 
     // lendo linha de comando
-    getline(&line_buf, &line_buf_size, stdin);
+    int charRead = getline(&line_buf, &line_buf_size, stdin);
 
-    // retirando o caracter \n ou \r do fim da string (lido pelo getline)
-    line_buf[strcspn(line_buf, "\r\n")] = '\0';
-    
+    // se tem mais que o char EOF (no minimo 2 char)
+    if (charRead > 1) {
+        line_buf[strlen(line_buf) - 1] = '\0';
+        rewind(stdin);
+    }
+    else { 
+        // se linha de comando for vazia
+        rewind(stdin);
+        return NULL;
+    }
+
+    return line_buf;
+}
+
+char **read_command_line(int *n_process) {
+    char* line_buf = parseInput();
+
     *n_process = n_process_counter(line_buf);
-
+    
     // se nao tem processo, retorna NULL
-    if (*n_process == 0)
+    if (*n_process == 0 || line_buf == NULL)
         return NULL;
 
     // aloca espaco para comandos
