@@ -1,6 +1,8 @@
 import sys
 import time
+import os
 
+print(os.getpid())
 args = sys.argv
 
 if len(args) == 1:
