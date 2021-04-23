@@ -26,14 +26,11 @@ void handle_sigusr_vsh() {
 }
 
 void handle_sigusr_sick() {
-    printf("SICK PID: %d, PPID: %d\n", getpid(), getppid());
-    // kill(getppid(), SIGUSR1);
+    printf("SICK PID: %d, PPID: %d GROUP:%d\n", getpid(), getppid(), getgid());
 }
 
 void handle_sigusr_vaccinated() {
-    // duvidas sobre todos os handlers
     printf("I am dad %d\n", getpid());
-    // raise(SIGTERM);
 }
 
 void handle_sigint() {
