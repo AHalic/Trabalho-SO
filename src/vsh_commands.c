@@ -20,7 +20,7 @@ void configure_signals_vsh() {
     sa_sigint.sa_handler = &handle_sigint;
     sa_sigquit.sa_handler = &handle_sigquit;
     sa_sigtstp.sa_handler = &handle_sigtstp;
-
+    
     sigaction(SIGINT, &sa_sigint, NULL);
     sigaction(SIGQUIT, &sa_sigquit, NULL);
     sigaction(SIGTSTP, &sa_sigtstp, NULL);
@@ -52,7 +52,7 @@ static int execute_command_child_bg(char* exec, char** argv, int pos, int n_com,
     if(!pid) {
         printf("Child forked: %d Dad: %d\n", getpid(), getppid());
         if (pos == 0)
-            // raise(SIGUSR1); // tava usando para mandar o SIGUSR1
+            raise(SIGUSR1); // tava usando para mandar o SIGUSR1
         
         // TODO: dar close nos pipes n usados
         if (!pos) {
@@ -91,8 +91,9 @@ static int execute_command_child_bg(char* exec, char** argv, int pos, int n_com,
 int execute_command(char* command, int bg, int fd[bg][2], int pos) {
     char* token = strtok(command, " ");
     char* exec = strdup(token);
-    char** argv = (char**) malloc (sizeof(char*) * 4); 
-
+    // char** argv = (char**) malloc (sizeof(char*) * 4); 
+    char* argv[4];
+    
     // primeiro argumento eh o executavel
     argv[0] = exec;
 
@@ -116,7 +117,7 @@ int execute_command(char* command, int bg, int fd[bg][2], int pos) {
     else
         pid = execute_command_child_bg(exec, argv, pos, bg, fd);
 
-    free(argv);
+    // free(argv);
     return pid;
 }
 
