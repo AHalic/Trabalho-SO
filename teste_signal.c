@@ -6,13 +6,13 @@
 
 
 int main() {
-    int pid, status;
-    if(!fork()){
+    int pid, status, filhos[2];
+    if((filhos[0] = fork()) == 0){
         printf("ssou 1 %d\n", getpid());
         sleep(25);
         exit(1);
     }
-    else if (!fork()) {
+    else if ((filhos[1] = fork()) == 0) {
         printf("ssou 2 %d\n", getpid());
         sleep(25);
         exit(2);
@@ -25,7 +25,13 @@ int main() {
 
                 if (WTERMSIG(status) == SIGUSR1) {
                     printf("achei usr, o pid é %d\n", pid);
-                    kill(pid, SIGKILL);
+                    if (pid) {
+                        for (int i = 0; i < 2; i++) {
+                            kill(filhos[i], SIGKILL);
+                        }
+                        
+                    }
+                    
                 }
             }
         }
