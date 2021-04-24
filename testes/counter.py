@@ -9,6 +9,7 @@ if len(args) == 1:
     print("You forgot to input an argument!")
     exit(1)
 
+time.sleep(10)
 value = int(args[1])
 
 for i in range(value):
