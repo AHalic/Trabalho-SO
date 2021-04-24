@@ -163,24 +163,24 @@ int execute_programs(int n_commands, char** commands_vector) {
         close_pipe(n_commands-1, fd, n_commands, 1); 
 
         // verifica estado dos filhos
+        printf("pai %d\n", getpid());
         while ((pid = waitpid(0, &status, WNOHANG)) > -1) {
             if (WIFSIGNALED(status)) {
                 // se filho terminou com SIGUSR1, mata todos os filhos
                 if (WTERMSIG(status) == SIGUSR1) {
-                    for (int i = 0; i < n_commands; i++) {
-                        kill(pids[i], SIGKILL);
-                    }
+                    kill(group, SIGKILL);
                 }
             }
         }
 
+        printf("%d aqui\n", getpid());
         exit(0); // termina processo auxiliar
     } 
     else if (n_commands == 1) {
         // foreground
         
         if(!command_line){
-        
+            printf("pai %d\n", getpid());
             pid_t pid = execute_command(commands_vector[0], n_commands-1, NULL, 0);
             exit(0); // termina processo auxiliar
         }
