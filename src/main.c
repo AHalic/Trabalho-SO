@@ -24,7 +24,10 @@ int execute_programs(int n_commands, char** commands_vector) {
         // background
 
         // faz os processos dps serem tudo da msm sessao
+        printf("antes sou da sessao %d\n", getsid(getpid()));
         pid_t group = setsid(); 
+        printf("dps sou da sessao %d e group %d\n", getsid(getpid()), group);
+        // setpgid(getpid(), group);
 
         struct sigaction sa_sigusr, sa_sigint, sa_sigquit, sa_sigtstp;
         sa_sigusr.sa_flags = sa_sigint.sa_flags = sa_sigquit.sa_flags = sa_sigtstp.sa_flags = SA_RESTART;
@@ -56,9 +59,10 @@ int execute_programs(int n_commands, char** commands_vector) {
             if (WIFSIGNALED(status)) {
                 // usa pra verificar se o filho terminou com sigusr1 (talvez seria legal n setar o handler do filho mas sim do pai)
                 if (WTERMSIG(status) == SIGUSR1) {
-                    for (int i = 0; i < n_commands; i++) {
-                        kill(pids[i], SIGKILL);
-                    }
+                    kill(group, SIGKILL);
+                    // for (int i = 0; i < n_commands; i++) {
+                    //     kill(pids[i], SIGKILL);
+                    // }
                 }
             }
         }
@@ -89,14 +93,14 @@ int main(int argc, char* argv[]) {
     // Configura a mascara de sinais bloqueados (SIGINT)
     // configure_signals_vsh();
 
-    // struct sigaction sa = {0};
-    // sa.sa_flags = SA_RESTART;
-    // sa.sa_handler = &handle_sigusr_vsh;
-    // sigaction(SIGUSR1, &sa, NULL);
+    struct sigaction sa = {0};
+    sa.sa_flags = SA_RESTART;
+    sa.sa_handler = &handle_sigusr_vsh;
+    sigaction(SIGUSR1, &sa, NULL);
 
     int n_commands = 0;
-    // printf("SHELL PID: %d\n", getpid());
-    // printf("GRUPO ID: %d\n", getgid());
+    printf("SHELL PID: %d\n", getpid());
+    printf("shell sou da sessao %d\n", getsid(getpid()));
     // signal(SIGUSR1, handle_sigusr_vsh);
 
     // ler primeira linha antes do loop
