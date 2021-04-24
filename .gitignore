@@ -7,3 +7,5 @@ vsh
 *.zip
 *.tar*
 
+# Arquivos vscode
+.vscode

@@ -9,85 +9,10 @@
 #include "vsh_handler.h"
 #include "vsh_commands.h"
 #include "vsh_errors.h"
+#include "vsh_execute.h"
 
 #define true 1
 #define false 0
-
-// pega a parte de executar comando que tava na main e faz uma função para isso
-// adicionando como seria mandado os sinais
-int execute_programs(int n_commands, char** commands_vector) {
-    pid_t command_line;
-    // faz um fork para auxiliar com a criação dos processos da linha de comando
-    if ((command_line = fork()) == -1) return error_fork();
-    
-    if(!command_line && n_commands > 1) {
-        // background
-
-        // faz os processos dps serem tudo da msm sessao
-        printf("antes sou da sessao %d\n", getsid(getpid()));
-        pid_t group = setsid(); 
-        printf("dps sou da sessao %d e group %d\n", getsid(getpid()), group);
-        // setpgid(getpid(), group);
-
-        struct sigaction sa_sigusr, sa_sigint, sa_sigquit, sa_sigtstp;
-        sa_sigusr.sa_flags = sa_sigint.sa_flags = sa_sigquit.sa_flags = sa_sigtstp.sa_flags = SA_RESTART;
-
-        sa_sigint.sa_handler = &handle_sigint;
-        sigaction(SIGINT, &sa_sigint, NULL);
-
-        sa_sigquit.sa_handler = &handle_sigquit;
-        sigaction(SIGQUIT, &sa_sigquit, NULL);
-
-        sa_sigtstp.sa_handler = &handle_sigquit;
-        sigaction(SIGQUIT, &sa_sigtstp, NULL);
-
-        // aux pra pegar o pid
-        pid_t pids[n_commands]; // usado pra guardar o pid dos filhos
-        pid_t pid; 
-        int status; // ver o status do pai com os filhos
-        int signaledUsr = 0; // ver se foi sinalizado SIGUSR1 pro pai
-        int fd[n_commands - 1][2];
-
-        open_pipe(n_commands, fd);
-        for (int i = 0; i < n_commands; i++) {
-            pids[i] = execute_command(commands_vector[i], n_commands-1, fd, i);  
-        }
-    
-        close_pipe(n_commands-1, fd, n_commands, 0);
-        close_pipe(n_commands-1, fd, n_commands, 1); 
-        while ((pid = waitpid(0, &status, WNOHANG)) > -1) {
-            if (WIFSIGNALED(status)) {
-                // usa pra verificar se o filho terminou com sigusr1 (talvez seria legal n setar o handler do filho mas sim do pai)
-                if (WTERMSIG(status) == SIGUSR1) {
-                    kill(group, SIGKILL);
-                    // for (int i = 0; i < n_commands; i++) {
-                    //     kill(pids[i], SIGKILL);
-                    // }
-                }
-            }
-        }
-
-        exit(0);
-    } 
-    else if (n_commands == 1) {
-        // foreground
-
-        if(!command_line){
-            // struct sigaction sa_sigusr;
-            // sa_sigusr.sa_flags = SA_RESTART;
-            // sa_sigusr.sa_handler = &handle_sigusr_sick;
-            
-            // sigaction(SIGUSR1, &sa_sigusr, NULL);
-            signal(SIGUSR1, SIG_IGN);
-            pid_t pid = execute_command(commands_vector[0], n_commands-1, NULL, 0);
-            exit(0);
-        }
-        // wait(NULL);
-        waitpid(command_line, NULL, WUNTRACED);
-    }
-
-    return 0;
-}
 
 int main(int argc, char* argv[]) {
     // Configura a mascara de sinais bloqueados (SIGINT)
@@ -99,8 +24,6 @@ int main(int argc, char* argv[]) {
     sigaction(SIGUSR1, &sa, NULL);
 
     int n_commands = 0;
-    printf("SHELL PID: %d\n", getpid());
-    printf("shell sou da sessao %d\n", getsid(getpid()));
     // signal(SIGUSR1, handle_sigusr_vsh);
 
     // ler primeira linha antes do loop
