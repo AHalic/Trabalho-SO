@@ -48,12 +48,12 @@ static int execute_command_child_fg (char* exec, char** argv) {
  * determinar uma nova sessao de grupo. A saida de um processo, eh a entrada do processo seguinte. Para 
  * isso eh utilizado a funcao dup(). A funcao deve retornar o pid do processo criado. 
  * 
- * @param {char* exec}  String do comando que deve ser executado
+ * @param {char* exec}  String do comando que deve ser executado.
  * @param {char** argv} Vetor de strings em que cada string eh um argumento. argv[0] deve ser o exec.
  * @param {int pos}     Posicao do comando na linha do terminal, iniciando do 0. Ex.: Em "ps1 | ps2 | ps3", 
  *                      ps2 tem pos 1.
- * @param {int n_com}   Numero de comandos na linha do terminal
- * @param {int fd[][2]} Matriz de pipes
+ * @param {int n_com}   Numero de comandos na linha do terminal.
+ * @param {int fd[][2]} Matriz de pipes.
  * 
  * @return Numero do processo do filho.
  */ 
@@ -99,7 +99,6 @@ static int execute_command_child_bg(char* exec, char** argv, int pos, int n_com,
 int execute_command(char* command, int bg, int fd[bg][2], int pos) {
     char* token = strtok(command, " ");
     char* exec = strdup(token);
-    // char** argv = (char**) malloc (sizeof(char*) * 4); 
     char* argv[4];
     
     // primeiro argumento eh o executavel
@@ -115,10 +114,12 @@ int execute_command(char* command, int bg, int fd[bg][2], int pos) {
             argv[i++] = token;
         }   
     }
+
     argv[i] = NULL;
 
-    // TODO: quando armageddon não é 1º da ruim
+    // TODO: quando armageddon não eh 1o da ruim
     if (quit_shell(exec)) exit(0);
+
     pid_t pid;
     if(!bg)
         pid = execute_command_child_fg(exec, argv);
@@ -173,8 +174,7 @@ int execute_programs(int n_commands, char** commands_vector) {
             }
         }
 
-        // termina processo auxiliar
-        exit(0);
+        exit(0); // termina processo auxiliar
     } 
     else if (n_commands == 1) {
         // foreground
@@ -182,8 +182,7 @@ int execute_programs(int n_commands, char** commands_vector) {
         if(!command_line){
         
             pid_t pid = execute_command(commands_vector[0], n_commands-1, NULL, 0);
-            // termina processo auxiliar
-            exit(0);
+            exit(0); // termina processo auxiliar
         }
 
         // espera o processo auxiliar terminar
