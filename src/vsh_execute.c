@@ -191,8 +191,8 @@ int execute_programs(int n_commands, char** commands_vector) {
             exit(0); // termina processo auxiliar
         }
 
-        // espera o processo auxiliar terminar
     }
+    // espera o processo auxiliar terminar
     waitpid(command_line, NULL, WUNTRACED);
 
     return 0;
