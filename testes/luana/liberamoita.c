@@ -12,20 +12,20 @@
 
 // code: 
 static void desespero(int signum) {
-    static int errors = 0; // children that finished with errors
-    static int total = 0; // total of children that finished
-    float percent = 0;
-    int status = 0;
+    static int errors = 0; // filhos com erro
+    static int total = 0; // filhos que terminaram
+    float percent = 0; // percentual
+    int status = 0; // status
 
-    // loop through all died children
+    // loop nos filhos mortos
     while(waitpid(-1, &status, WNOHANG) > 0) {
-        // update counters
+        // atualiza contador
         if (WIFEXITED(status) && WEXITSTATUS(status) != EXIT_SUCCESS) {
-            errors++;
+            errors++; // incrementa os erros
         }
-        total++;
+        total++; // incrementa os acertos
     }   
-    // print statistics
+    // print
     percent = (total != 0) ? (float)(errors) / total * 100 : 0;
     printf("Errors: %d, Total: %d, Percent: %.2f%%\n", errors, total, percent);
 }
@@ -40,7 +40,6 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    while (1) { // indefinidely fork and exec children
         // sleep the expected time, even if an interruption occurs
         sleep_remaining = PAUSE_BETWEEN_LAUNCHES;
         while ((sleep_remaining = sleep(sleep_remaining)) > 0) { }
@@ -55,7 +54,6 @@ int main(int argc, char *argv[]) {
         } else {
             printf("Error on fork\n");
         }
-    }
 
     return 0;
 }
