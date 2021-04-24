@@ -50,9 +50,9 @@ static int execute_command_child_bg(char* exec, char** argv, int pos, int n_com,
     int pid = fork();
     
     if(!pid) {
-        printf("Child forked: %d Dad: %d\n", getpid(), getppid());
-        if (pos == 0)
+        if (pos == 0){
             raise(SIGUSR1); // tava usando para mandar o SIGUSR1
+        }
         
         // TODO: dar close nos pipes n usados
         if (!pos) {

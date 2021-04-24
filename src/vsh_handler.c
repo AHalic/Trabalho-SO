@@ -27,6 +27,7 @@ void handle_sigusr_vsh() {
 
 void handle_sigusr_sick() {
     printf("SICK PID: %d, PPID: %d GROUP:%d\n", getpid(), getppid(), getgid());
+    exit(SIGUSR1);
 }
 
 void handle_sigusr_vaccinated() {

@@ -1,7 +1,7 @@
 import time
 
-# ls = input()
+ls = input()
 
-time.sleep(20)
+time.sleep(1)
 
-# print(ls)
+print(ls)
