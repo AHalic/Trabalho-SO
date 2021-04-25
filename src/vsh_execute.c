@@ -63,6 +63,7 @@ static int execute_command_child_bg(char* exec, char** argv, int pos, int n_com,
     
     if(!pid) {
         // TODO: dar close nos pipes n usados
+        printf("sou %d\n", getpid());
         if (!pos) {
             close(1);
             close_pipe(n_com, fd, 0, 1);
@@ -117,9 +118,6 @@ int execute_command(char* command, int bg, int fd[bg][2], int pos) {
 
     argv[i] = NULL;
 
-    // TODO: quando armageddon não eh 1o da ruim
-    // if (quit_shell(exec)) exit(0);
-
     pid_t pid;
     if(!bg)
         pid = execute_command_child_fg(exec, argv);
@@ -133,16 +131,14 @@ int execute_command(char* command, int bg, int fd[bg][2], int pos) {
 int execute_programs(int n_commands, char** commands_vector) {
     pid_t command_line;
     // faz um fork para auxiliar com a criação dos processos da linha de comando
-    // printf("sou shell %d da sessao %d\n", getpid(), getsid(getpid()));
     if ((command_line = fork()) == -1) return error_fork();
-    
+
+   
     // background
-    if(!command_line && n_commands > 1) {
-        // faz os processos serem da mesma sessao
-        // printf("sou commandline %d da sessao %d\n", getpid(), getsid(getpid()));
-        
-        pid_t process_aux = fork();
-        if (!process_aux) {
+    else if(!command_line && n_commands > 1) {
+        // faz os processos serem da mesma sessao        
+        // pid_t process_aux = fork();
+        // if (!process_aux) {
             pid_t group = setsid(); 
 
             sigset_t mask;
@@ -167,34 +163,32 @@ int execute_programs(int n_commands, char** commands_vector) {
             close_pipe(n_commands-1, fd, n_commands, 1); 
 
             // verifica estado dos filhos
-            // printf("sou %d da sessao %d\n", getpid(), getsid(getpid()));
             while ((pid = waitpid(0, &status, WNOHANG)) > -1) {
                 if (WIFSIGNALED(status)) {
                     // se filho terminou com SIGUSR1, mata todos os filhos
-                    if (WTERMSIG(status) == SIGUSR1) {
+                    if (WTERMSIG(status) == SIGUSR1 || WTERMSIG(status) == SIGUSR2) {
                         kill(group, SIGKILL);
                     }
                 }
             }
 
-            // printf("%d aqui\n", getpid());
-            exit(0); // termina processo auxiliar
-        }
-        exit(1);
+            destroy_zombies("liberamoita", getpid());
+            // exit(0); // termina processo auxiliar
+        // }
+
+        exit(getpid());
     } 
     else if (n_commands == 1) {
         // foreground
-        
         if(!command_line){
-            // printf("pai %d\n", getpid());
             configure_signals_fg();
             pid_t pid = execute_command(commands_vector[0], n_commands-1, NULL, 0);
             exit(0); // termina processo auxiliar
         }
-
+        waitpid(command_line, NULL, WUNTRACED);
     }
+    
     // espera o processo auxiliar terminar
-    waitpid(command_line, NULL, WUNTRACED);
 
-    return 0;
+    return command_line;
 }
