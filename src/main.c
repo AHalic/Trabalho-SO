@@ -16,16 +16,9 @@
 
 int main(int argc, char* argv[]) {
     // Configura a mascara de sinais bloqueados (SIGINT)
-    // configure_signals_vsh();
-
-    // struct sigaction sa = {0};
-    // sa.sa_flags = SA_RESTART;
-    // sa.sa_handler = &handle_sigusr_vsh;
-    // sigaction(SIGUSR1, &sa, NULL);
+    configure_signals_vsh();
 
     int n_commands = 0;
-
-    // signal(SIGUSR1, handle_sigusr_vsh);
 
     // ler primeira linha antes do loop
     do {
