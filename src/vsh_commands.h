@@ -4,6 +4,8 @@
 
 void configure_signals_vsh();
 
+void configure_signals_fg();
+
 int quit_shell(char* command, pid_t* pids, int n_commands);
 
 int destroy_zombies();
