@@ -13,17 +13,33 @@
 #include "vsh_handler.h"
 
 void configure_signals_vsh() {
-    // Configura a mascara de sinais bloqueados (SIGINT)
-    struct sigaction sa_sigint, sa_sigquit, sa_sigtstp;
-    sa_sigint.sa_flags = sa_sigquit.sa_flags = sa_sigtstp.sa_flags = SA_RESTART;
+    struct sigaction sa_sigint, sa_sigquit, sa_sigtstp, sa_sigusr;
+    sa_sigint.sa_flags = sa_sigquit.sa_flags = sa_sigtstp.sa_flags = sa_sigusr.sa_flags = SA_RESTART;
 
     sa_sigint.sa_handler = &handle_sigint;
     sa_sigquit.sa_handler = &handle_sigquit;
     sa_sigtstp.sa_handler = &handle_sigtstp;
+    sa_sigusr.sa_handler = &handle_sigusr_vsh;
     
     sigaction(SIGINT, &sa_sigint, NULL);
     sigaction(SIGQUIT, &sa_sigquit, NULL);
     sigaction(SIGTSTP, &sa_sigtstp, NULL);
+    sigaction(SIGUSR1, &sa_sigusr, NULL);
+    sigaction(SIGUSR2, &sa_sigusr, NULL);
+}
+
+void configure_signals_fg() {
+    struct sigaction sa_dft, sa_sigusr;
+    sa_dft.sa_flags =  sa_sigusr.sa_flags = SA_RESTART;
+
+    sa_dft.sa_handler = SIG_DFL;
+    sa_sigusr.sa_handler = SIG_IGN;
+    
+    sigaction(SIGINT, &sa_dft, NULL);
+    sigaction(SIGQUIT, &sa_dft, NULL);
+    sigaction(SIGTSTP, &sa_dft, NULL);
+    sigaction(SIGUSR1, &sa_sigusr, NULL);
+    sigaction(SIGUSR2, &sa_sigusr, NULL);
 }
 
 int quit_shell(char* command, pid_t* pids, int n_commands) {
