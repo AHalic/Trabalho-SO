@@ -49,6 +49,18 @@ int quit_shell(char* command, pid_t* pids, int n_commands) {
             kill(pids[i], SIGTERM);
         }
         
+        // pid_t pid;
+        // int status;
+        //  // loop nos filhos mortos
+        // while((pid = waitpid(-1, &status, WNOHANG)) > -1) {
+        //     // atualiza contador
+        //     printf("pid: %d\n", pid);
+        //     if (WIFEXITED(status) && WEXITSTATUS(status) != EXIT_SUCCESS) {
+        //         kill(pid, )
+        //     }
+        //     total++; // incrementa os acertos
+        // }   
+        
         exit(0);
         free(command);
         return 1;
@@ -57,7 +69,7 @@ int quit_shell(char* command, pid_t* pids, int n_commands) {
     return 0;
 }
 
-int destroy_zombies(char* command){
+int destroy_zombies(char* command, int pid){
     static int errors = 0; // filhos com erro
     static int total = 0; // filhos que terminaram
     float percent = 0; // percentual
@@ -65,17 +77,18 @@ int destroy_zombies(char* command){
 
     if (strstr(command, "liberamoita")){
          // loop nos filhos mortos
-        while(waitpid(-1, &status, WNOHANG) > 0) {
-            // atualiza contador
-            if (WIFEXITED(status) && WEXITSTATUS(status) != EXIT_SUCCESS) {
-                errors++; // incrementa os erros
+
+        if (pid) {
+            while(waitpid(0, NULL, WUNTRACED) > -1);
+            // nao funcionou isso
+            // a minha ideia era q podiamos usar pra wait os filhos
+        }
+        else {
+            while((pid = waitpid(-1, &status, WNOHANG)) > -1) {
+            // atualiza contadorif (WIFEXITED(status) && WEXITSTATUS(status) != EXIT_SUCCESS) {
             }
-            total++; // incrementa os acertos
         }   
-        // print teste
-        percent = (total != 0) ? (float)(errors) / total * 100 : 0;
-        printf("Errors: %d, Total: %d, Percent: %.2f%%\n", errors, total, percent);
-        free(command);
+        
         return 1;
     }
 

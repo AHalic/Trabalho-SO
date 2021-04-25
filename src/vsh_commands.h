@@ -8,7 +8,7 @@ void configure_signals_fg();
 
 int quit_shell(char* command, pid_t* pids, int n_commands);
 
-int destroy_zombies();
+int destroy_zombies(char* command, int pid);
 
 void destroy_commands(char** commands, int n_commands);
 
