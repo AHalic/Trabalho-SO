@@ -180,7 +180,7 @@ int execute_programs(int n_commands, char** commands_vector) {
         // foreground
         
         if(!command_line){
-        
+            configure_signals_fg();
             pid_t pid = execute_command(commands_vector[0], n_commands-1, NULL, 0);
             exit(0); // termina processo auxiliar
         }
