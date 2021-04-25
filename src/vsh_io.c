@@ -59,7 +59,7 @@ char **read_command_line(int *n_process) {
     if (*n_process == 0 || line_buf == NULL)
         return NULL;
 
-    if (quit_shell(line_buf)) exit(0);
+    // if (quit_shell(line_buf)) exit(0);
 
     // aloca espaco para comandos
     char **commands_vector = (char **)malloc(sizeof(char *) * (*n_process)); // free

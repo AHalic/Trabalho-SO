@@ -16,7 +16,7 @@
 
 int main(int argc, char* argv[]) {
     // Configura a mascara de sinais bloqueados (SIGINT)
-    configure_signals_vsh();
+    // configure_signals_vsh();
 
     int n_commands = 0;
 

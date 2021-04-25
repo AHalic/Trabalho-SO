@@ -118,7 +118,7 @@ int execute_command(char* command, int bg, int fd[bg][2], int pos) {
     argv[i] = NULL;
 
     // TODO: quando armageddon não eh 1o da ruim
-    if (quit_shell(exec)) exit(0);
+    // if (quit_shell(exec)) exit(0);
 
     pid_t pid;
     if(!bg)
@@ -132,62 +132,69 @@ int execute_command(char* command, int bg, int fd[bg][2], int pos) {
 
 int execute_programs(int n_commands, char** commands_vector) {
     pid_t command_line;
-
     // faz um fork para auxiliar com a criação dos processos da linha de comando
+    // printf("sou shell %d da sessao %d\n", getpid(), getsid(getpid()));
     if ((command_line = fork()) == -1) return error_fork();
     
     // background
     if(!command_line && n_commands > 1) {
         // faz os processos serem da mesma sessao
-        pid_t group = setsid(); 
+        // printf("sou commandline %d da sessao %d\n", getpid(), getsid(getpid()));
+        
+        pid_t process_aux = fork();
+        if (!process_aux) {
+            pid_t group = setsid(); 
 
-        sigset_t mask;
-        sigemptyset(&mask);
-        sigaddset(&mask, SIGINT);
-        sigaddset(&mask, SIGQUIT);
-        sigaddset(&mask, SIGTSTP);
+            sigset_t mask;
+            sigemptyset(&mask);
+            sigaddset(&mask, SIGINT);
+            sigaddset(&mask, SIGQUIT);
+            sigaddset(&mask, SIGTSTP);
 
-        pid_t pids[n_commands];        // usado pra guardar o pid dos filhos
-        pid_t pid;                     // aux pra pegar o pid
-        int status;                    // ver o status do pai com os filhos
-        int signaledUsr = 0;           // ver se foi sinalizado SIGUSR1 pro pai
-        int fd[n_commands - 1][2];     // vetor de pipes
+            pid_t pids[n_commands];        // usado pra guardar o pid dos filhos
+            pid_t pid;                     // aux pra pegar o pid
+            int status;                    // ver o status do pai com os filhos
+            int signaledUsr = 0;           // ver se foi sinalizado SIGUSR1 pro pai
+            int fd[n_commands - 1][2];     // vetor de pipes
 
-        open_pipe(n_commands, fd);
-        for (int i = 0; i < n_commands; i++) {
-            // executa programas e retorna pid
-            pids[i] = execute_command(commands_vector[i], n_commands-1, fd, i);   
-        }
-    
-        close_pipe(n_commands-1, fd, n_commands, 0);
-        close_pipe(n_commands-1, fd, n_commands, 1); 
+            open_pipe(n_commands, fd);
+            for (int i = 0; i < n_commands; i++) {
+                // executa programas e retorna pid
+                pids[i] = execute_command(commands_vector[i], n_commands-1, fd, i);   
+            }
+        
+            close_pipe(n_commands-1, fd, n_commands, 0);
+            close_pipe(n_commands-1, fd, n_commands, 1); 
 
-        // verifica estado dos filhos
-        while ((pid = waitpid(0, &status, WNOHANG)) > -1) {
-            if (WIFSIGNALED(status)) {
-                // se filho terminou com SIGUSR1, mata todos os filhos
-                if (WTERMSIG(status) == SIGUSR1) {
-                    for (int i = 0; i < n_commands; i++) {
-                        kill(pids[i], SIGKILL);
+            // verifica estado dos filhos
+            // printf("sou %d da sessao %d\n", getpid(), getsid(getpid()));
+            while ((pid = waitpid(0, &status, WNOHANG)) > -1) {
+                if (WIFSIGNALED(status)) {
+                    // se filho terminou com SIGUSR1, mata todos os filhos
+                    if (WTERMSIG(status) == SIGUSR1) {
+                        kill(group, SIGKILL);
                     }
                 }
             }
-        }
 
-        exit(0); // termina processo auxiliar
+            // printf("%d aqui\n", getpid());
+            exit(0); // termina processo auxiliar
+        }
+        exit(1);
     } 
     else if (n_commands == 1) {
         // foreground
         
         if(!command_line){
+            // printf("pai %d\n", getpid());
             configure_signals_fg();
             pid_t pid = execute_command(commands_vector[0], n_commands-1, NULL, 0);
             exit(0); // termina processo auxiliar
         }
 
-        // espera o processo auxiliar terminar
-        waitpid(command_line, NULL, WUNTRACED);
     }
+    // espera o processo auxiliar terminar
+    waitpid(command_line, NULL, WUNTRACED);
 
     return 0;
 }
