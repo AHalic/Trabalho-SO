@@ -34,10 +34,10 @@ int main(int argc, char* argv[]) {
 
         if (n_commands == 0) continue;
 
-        if (quit_shell(commands_vector[0])) {
-            free(commands_vector);
-            return 0;
-        }
+        // if (quit_shell(commands_vector[0])) {
+        //     free(commands_vector);
+        //     return 0;
+        // }
         
         execute_programs(n_commands, commands_vector);
         destroy_commands(commands_vector, n_commands);

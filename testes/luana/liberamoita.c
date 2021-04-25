@@ -11,7 +11,7 @@
 #define CHILD_PATH "./maybe_it_works"
 
 // code: 
-static void desespero(int signum) {
+static void liberamoita(int signum) {
     static int errors = 0; // filhos com erro
     static int total = 0; // filhos que terminaram
     float percent = 0; // percentual
@@ -35,8 +35,8 @@ int main(int argc, char *argv[]) {
     int sleep_remaining = 0; // remaining time to sleep
 
     // set handler to SIGCHLD
-    if (signal(SIGCHLD, desespero) == SIG_ERR) {
-        printf("Error while setting a signal handler\n");
+    if (signal(SIGCHLD, liberamoita) == SIG_ERR) {
+        printf("Erro handler\n");
         exit(EXIT_FAILURE);
     }
 
@@ -47,12 +47,12 @@ int main(int argc, char *argv[]) {
         if (pid >= 0) { // fork successful
             if (pid == 0) { // child
                 if (! execl(CHILD_PATH, CHILD_PATH, (char *)(NULL))) { // exec child program
-                    printf("Error on exec\n");
+                    printf("Error no exec\n");
                     exit(EXIT_FAILURE);
                 }
             }
         } else {
-            printf("Error on fork\n");
+            printf("Error no fork\n");
         }
 
     return 0;
