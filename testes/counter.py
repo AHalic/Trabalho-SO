@@ -12,6 +12,8 @@ if len(args) == 1:
 value = int(args[1])
 
 for i in range(value):
-    print(f"I am iteration #{i+1}")
+    # print(f"I am iteration #{i+1}")
     time.sleep(2)
     
+
+print("terminei")
