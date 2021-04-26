@@ -16,8 +16,8 @@
 
 int main(int argc, char* argv[]) {
     // Configura a mascara de sinais bloqueados (SIGINT)
-    configure_signals_vsh();
 
+    configure_signals_vsh_sigusr();
     int n_commands = 0, session;
 
     // ler primeira linha antes do loop
@@ -32,11 +32,12 @@ int main(int argc, char* argv[]) {
         //     return 0;
         // }
         if(n_commands == 1){
-            if(destroy_zombies(commands_vector[0], 0))
+            if(destroy_zombies(commands_vector[0]))
                 continue;
         }
         
         session = execute_programs(n_commands, commands_vector);
+        configure_signals_vsh();
         destroy_commands(commands_vector, n_commands);
 
     } while (true);
