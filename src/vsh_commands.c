@@ -13,41 +13,66 @@
 #include "vsh_handler.h"
 
 void configure_signals_vsh() {
-    struct sigaction sa_sigint, sa_sigquit, sa_sigtstp, sa_sigusr;
-    sa_sigint.sa_flags = sa_sigquit.sa_flags = sa_sigtstp.sa_flags = sa_sigusr.sa_flags = SA_RESTART;
+    struct sigaction block_signal;
+    sigset_t mask;
 
-    sa_sigint.sa_handler = &handle_sigint;
-    sa_sigquit.sa_handler = &handle_sigquit;
-    sa_sigtstp.sa_handler = &handle_sigtstp;
-    sa_sigusr.sa_handler = &handle_sigusr_vsh;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGINT);
+    sigaddset(&mask, SIGQUIT);
+    sigaddset(&mask, SIGTSTP);
+
+    block_signal.sa_mask = mask;
+    block_signal.sa_handler = &handle_sigusr_vsh;
+    block_signal.sa_flags = SA_RESTART;
+    // sa_sigint.sa_flags = sa_sigquit.sa_flags = sa_sigtstp.sa_flags = sa_sigusr.sa_flags = SA_RESTART;
+
+    // sa_sigint.sa_handler = &handle_sigint;
+    // sa_sigquit.sa_handler = &handle_sigquit;
+    // sa_sigtstp.sa_handler = &handle_sigtstp;
+    // sa_sigusr.sa_handler = &handle_sigusr_vsh;
     
-    sigaction(SIGINT, &sa_sigint, NULL);
-    sigaction(SIGQUIT, &sa_sigquit, NULL);
-    sigaction(SIGTSTP, &sa_sigtstp, NULL);
-    sigaction(SIGUSR1, &sa_sigusr, NULL);
-    sigaction(SIGUSR2, &sa_sigusr, NULL);
+    // sigaction(SIGINT, &sa_sigint, NULL);
+    // sigaction(SIGQUIT, &sa_sigquit, NULL);
+    // sigaction(SIGTSTP, &sa_sigtstp, NULL);
+    sigaction(SIGUSR1, &block_signal, NULL);
+    sigaction(SIGUSR2, &block_signal, NULL);
 }
 
-void configure_signals_fg() {
-    struct sigaction sa_dft, sa_sigusr;
-    sa_dft.sa_flags =  sa_sigusr.sa_flags = SA_RESTART;
 
-    sa_dft.sa_handler = SIG_DFL;
-    sa_sigusr.sa_handler = SIG_IGN;
+
+void configure_signals_fg() {
+    struct sigaction block_signal;
+    sigset_t mask;
+
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGINT);
+    sigaddset(&mask, SIGQUIT);
+    sigaddset(&mask, SIGTSTP);
+
+    block_signal.sa_mask = mask;
+    block_signal.sa_handler = SIG_IGN;
+    block_signal.sa_flags = SA_RESTART;
     
-    sigaction(SIGINT, &sa_dft, NULL);
-    sigaction(SIGQUIT, &sa_dft, NULL);
-    sigaction(SIGTSTP, &sa_dft, NULL);
-    sigaction(SIGUSR1, &sa_sigusr, NULL);
-    sigaction(SIGUSR2, &sa_sigusr, NULL);
+    sigaction(SIGUSR1, &block_signal, NULL);
+    sigaction(SIGUSR2, &block_signal, NULL);
+
+    // struct sigaction sa_dft, sa_sigusr;
+    // sa_dft.sa_flags =  sa_sigusr.sa_flags = SA_RESTART;
+
+    // sa_dft.sa_handler = SIG_DFL;
+    // sa_sigusr.sa_handler = SIG_IGN;
+    
+    // sigaction(SIGINT, &sa_dft, NULL);
+    // sigaction(SIGQUIT, &sa_dft, NULL);
+    // sigaction(SIGTSTP, &sa_dft, NULL);
 }
 
 int quit_shell(char* command, pid_t* pids, int n_commands) {
     // Ve se existe a substring armageddon
     if (strstr(command, "armageddon")) {
-        for(int i = 0; i < n_commands; i++){
-            kill(pids[i], SIGTERM);
-        }
+        // for(int i = 0; i < n_commands; i++){
+        //     kill(pids[i], SIGTERM);
+        // }
         
         // pid_t pid;
         // int status;
@@ -61,8 +86,8 @@ int quit_shell(char* command, pid_t* pids, int n_commands) {
         //     total++; // incrementa os acertos
         // }   
         
-        exit(0);
         free(command);
+        exit(0);
         return 1;
     }
 

@@ -137,8 +137,8 @@ int execute_programs(int n_commands, char** commands_vector) {
     // background
     else if(!command_line && n_commands > 1) {
         // faz os processos serem da mesma sessao        
-        // pid_t process_aux = fork();
-        // if (!process_aux) {
+        pid_t process_aux = fork();
+        if (!process_aux) {
             pid_t group = setsid(); 
 
             sigset_t mask;
@@ -172,9 +172,9 @@ int execute_programs(int n_commands, char** commands_vector) {
                 }
             }
 
-            destroy_zombies("liberamoita", getpid());
-            // exit(0); // termina processo auxiliar
-        // }
+            // destroy_zombies("liberamoita", getpid());
+            exit(0); // termina processo auxiliar
+        }
 
         exit(getpid());
     } 
@@ -185,9 +185,9 @@ int execute_programs(int n_commands, char** commands_vector) {
             pid_t pid = execute_command(commands_vector[0], n_commands-1, NULL, 0);
             exit(0); // termina processo auxiliar
         }
-        waitpid(command_line, NULL, WUNTRACED);
     }
     
+    waitpid(command_line, NULL, WUNTRACED);
     // espera o processo auxiliar terminar
 
     return command_line;
