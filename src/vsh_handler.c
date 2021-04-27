@@ -5,14 +5,6 @@
 #include <unistd.h>
 #include <signal.h>
 
-void configure_sigaction_fg() {
-    
-}
-
-void configure_sigaction_bg() {
-
-}
-
 void handle_sigusr_vsh() {
     printf("\n"
             "              _  _\n"
@@ -25,23 +17,4 @@ void handle_sigusr_vsh() {
             "I feel weird...\n");
 }
 
-void handle_sigusr_sick() {
-    printf("SICK PID: %d, PPID: %d GROUP:%d\n", getpid(), getppid(), getgid());
-    exit(SIGUSR1);
-}
 
-void handle_sigusr_vaccinated() {
-    printf("I am dad %d\n", getpid());
-}
-
-void handle_sigint() {
-    return;
-}
-
-void handle_sigquit() {
-    return;
-}
-
-void handle_sigtstp() {
-    return;
-}
