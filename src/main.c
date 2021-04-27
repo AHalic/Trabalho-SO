@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "vsh_io.h"
 #include "vsh_handler.h"
 #include "vsh_commands.h"
