@@ -11,6 +11,7 @@
 #include "vsh_io.h"
 #include "vsh_errors.h"
 #include "vsh_handler.h"
+#include "vsh_list.h"
 
 void configure_signals_vsh() {
     struct sigaction sa_dft;
@@ -76,51 +77,44 @@ void configure_signals_fg() {
     sigaction(SIGUSR2, &block_signal, NULL);
 }
 
-int quit_shell(char* command, pid_t* pids, int n_commands) {
+int quit_shell(char* command, SessionList* s_list) {
     // Ve se existe a substring armageddon
+    printf("is list null?: %d\n", s_list == NULL);
+    for(SessionList* aux = s_list; aux != NULL; aux = aux->next){
+        printf("group: %d\n", aux->gid);
+    }
+
     if (strstr(command, "armageddon")) {
-        for(int i = 0; i < n_commands; i++){
-            kill(pids[i], SIGKILL);
+        int group;
+        for(SessionList* aux = s_list; aux != NULL; aux = aux->next){
+            group = aux->gid * -1;
+            kill(group, SIGKILL);
         }
-        
-        // pid_t pid;
-        // int status;
-        //  // loop nos filhos mortos
-        // while((pid = waitpid(-1, &status, WNOHANG)) > -1) {
-        //     // atualiza contador
-        //     printf("pid: %d\n", pid);
-        //     if (WIFEXITED(status) && WEXITSTATUS(status) != EXIT_SUCCESS) {
-        //         kill(pid, )
-        //     }
-        //     total++; // incrementa os acertos
-        // }   
-        
-        free(command);
-        exit(0);
         return 1;
     }
 
     return 0;
 }
 
-int destroy_zombies(char* command){
-    static int errors = 0; // filhos com erro
-    static int total = 0; // filhos que terminaram
-    float percent = 0; // percentual
-    int status = 0; // status
+int destroy_zombies(char* command, pid_t group_pid){
+    int status;
+    pid_t pid;
+    group_pid *= -1;
 
     if (strstr(command, "liberamoita")){
          // loop nos filhos mortos
-        while(waitpid(-1, &status, WNOHANG) > -1) {
+        printf("liberamoita in\n");
+        while((pid = waitpid(group_pid, &status, WNOHANG)) > -1) {
             // atualiza contador
-            if (WIFEXITED(status) && WEXITSTATUS(status) != EXIT_SUCCESS){
-                break;
+            if (WIFEXITED(status) && (WEXITSTATUS(status)!= EXIT_SUCCESS)){
+                printf("pid in: %d\n", pid);
             }
-        }   
-    }
+        }  
+
         // print teste
-        free(command);
+        // free(command);
         return 1;
+    }
 
     return 0;
 }
