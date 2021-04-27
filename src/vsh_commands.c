@@ -110,9 +110,7 @@ int destroy_zombies(char* command, pid_t group_pid){
                 printf("pid in: %d\n", pid);
             }
         }  
-
-        // print teste
-        // free(command);
+        
         return 1;
     }
 
