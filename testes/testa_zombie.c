@@ -27,7 +27,8 @@ int main()
         printf("Bem, agora eu vou bloquear e esperar pelo término do meu filho.\n") ;
         // wait(NULL);  /* pai esperando pelo término do filho */
         printf("Pronto... meu filho terminou... agora vou terminar também! Tchau!\n") ;
-        for(;;) ; /* pai bloqueado em loop infinito */
+        // for(;;) ; /* pai bloqueado em loop infinito */
+        sleep(60);
 // 
     }
 }
