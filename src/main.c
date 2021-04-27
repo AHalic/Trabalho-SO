@@ -48,9 +48,9 @@ int main(int argc, char* argv[]) {
         configure_signals_vsh();
 
         // libera zombies criados em processos bg
-        if (n_commands > 1) {
-            destroy_zombies("liberamoita", 1);
-        }
+        // if (n_commands > 1) {
+        //     destroy_zombies("liberamoita", 1);
+        // }
         
         // libera o vetor de comandos
         destroy_commands(commands_vector, n_commands);
