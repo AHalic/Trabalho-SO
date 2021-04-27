@@ -12,7 +12,7 @@ void configure_signals_fg();
 
 void configure_signals_vsh_ignore();
 
-int quit_shell(char* command, SessionList* s_list);
+int quit_shell(char* command, session_list* s_list);
 
 int destroy_zombies(char* command, pid_t _pid);
 

@@ -77,16 +77,16 @@ void configure_signals_fg() {
     sigaction(SIGUSR2, &block_signal, NULL);
 }
 
-int quit_shell(char* command, SessionList* s_list) {
+int quit_shell(char* command, session_list* s_list) {
     // Ve se existe a substring armageddon
     printf("is list null?: %d\n", s_list == NULL);
-    for(SessionList* aux = s_list; aux != NULL; aux = aux->next){
+    for(session_list* aux = s_list; aux != NULL; aux = aux->next){
         printf("group: %d\n", aux->gid);
     }
 
     if (strstr(command, "armageddon")) {
         int group;
-        for(SessionList* aux = s_list; aux != NULL; aux = aux->next){
+        for(session_list* aux = s_list; aux != NULL; aux = aux->next){
             group = aux->gid * -1;
             kill(group, SIGKILL);
         }

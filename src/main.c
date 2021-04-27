@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
     configure_signals_vsh_sigusr();
 
     // cria lista vazia para gid
-    SessionList* gid_list = init_empty_gid_list();
+    session_list* gid_list = init_empty_gid_list();
 
     int n_commands = 0, session;
 
