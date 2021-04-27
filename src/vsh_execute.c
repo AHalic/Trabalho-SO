@@ -84,7 +84,7 @@ static int execute_command_child_bg(char* exec, char** argv, int pos, int n_com,
         // executa comando
         if(execvp(exec, argv) == -1){
             int error = error_execvp();
-            free(argv);
+            // free(argv);
             exit(error);
         }
     }
@@ -138,7 +138,7 @@ int execute_programs(int n_commands, char** commands_vector) {
         pid_t pid = waitpid(command_line, &status, WUNTRACED);
     }
     // foreground
-    else {
+    else if (!command_line) {
         if (n_commands > 1) {
             pid_t group = setsid(); 
 
@@ -199,49 +199,43 @@ int execute_programs_teste(int n_commands, char** commands_vector) {
         // espera o processo auxiliar terminar
         pid_t pid = waitpid(command_line * -1, &status, WUNTRACED);
     }
-    else {
+    else if (!command_line) {
         if (n_commands > 1) {
-            // pid_t process_aux = fork();
-            // if (!process_aux) {
+            // cria uma nova sessao
+            pid_t group = setsid(); 
 
-                pid_t group = setsid(); 
+            sigset_t mask;
+            sigemptyset(&mask);
+            sigaddset(&mask, SIGINT);
+            sigaddset(&mask, SIGQUIT);
+            sigaddset(&mask, SIGTSTP);
 
-                sigset_t mask;
-                sigemptyset(&mask);
-                sigaddset(&mask, SIGINT);
-                sigaddset(&mask, SIGQUIT);
-                sigaddset(&mask, SIGTSTP);
+            pid_t pids[n_commands];        // usado pra guardar o pid dos filhos
+            pid_t pid;                     // aux pra pegar o pid
+            int status;                    // ver o status do pai com os filhos
+            int signaledUsr = 0;           // ver se foi sinalizado SIGUSR1 pro pai
+            int fd[n_commands - 1][2];     // vetor de pipes
 
-                pid_t pids[n_commands];        // usado pra guardar o pid dos filhos
-                pid_t pid;                     // aux pra pegar o pid
-                int status;                    // ver o status do pai com os filhos
-                int signaledUsr = 0;           // ver se foi sinalizado SIGUSR1 pro pai
-                int fd[n_commands - 1][2];     // vetor de pipes
+            open_pipe(n_commands, fd);
+            for (int i = 0; i < n_commands; i++) {
+                // executa programas e retorna pid
+                pids[i] = execute_command(commands_vector[i], n_commands-1, fd, i);   
+            }
+        
+            close_pipe(n_commands-1, fd, n_commands, 0);
+            close_pipe(n_commands-1, fd, n_commands, 1); 
 
-                open_pipe(n_commands, fd);
-                for (int i = 0; i < n_commands; i++) {
-                    // executa programas e retorna pid
-                    pids[i] = execute_command(commands_vector[i], n_commands-1, fd, i);   
-                }
-            
-                close_pipe(n_commands-1, fd, n_commands, 0);
-                close_pipe(n_commands-1, fd, n_commands, 1); 
-
-                // verifica estado dos filhos
-                while ((pid = waitpid(0, &status, WNOHANG)) > -1) {
-                    if (WIFSIGNALED(status)) {
-                        // se filho terminou com SIGUSR1, mata todos os filhos
-                        if (WTERMSIG(status) == SIGUSR1 || WTERMSIG(status) == SIGUSR2) {
-                            kill(group * -1, SIGKILL);
-                        }
+            // verifica estado dos filhos
+            while ((pid = waitpid(0, &status, WNOHANG)) > -1) {
+                if (WIFSIGNALED(status)) {
+                    // se filho terminou com SIGUSR1, mata todos os filhos
+                    if (WTERMSIG(status) == SIGUSR1 || WTERMSIG(status) == SIGUSR2) {
+                        kill(group * -1, SIGKILL);
                     }
                 }
+            }
 
             exit(0); // termina processo auxiliar
-            // }
-
-            
-            // exit(process_aux);
         } 
         else if (n_commands == 1){
             configure_signals_fg();
