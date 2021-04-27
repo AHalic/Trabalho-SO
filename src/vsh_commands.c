@@ -98,24 +98,9 @@ int destroy_zombies(char* command, pid_t group_pid){
     group_pid *= -1;
 
     if (strstr(command, "liberamoita")){
-         // loop nos filhos mortos
-        printf("liberamoita in\n");
         while((pid = waitpid(-1, &status, WNOHANG)) > -1) {
-            // atualiza contador
-            if (!WIFSIGNALED(status)) {
-
-            }
-            if (WIFEXITED(status) && (WEXITSTATUS(status)!= EXIT_SUCCESS)){
-                printf("pid in: %d\n", pid);
-            }
         }  
         
-        // while((pid = wait(&status)) > -1) {
-        //     if(pid > 0) {
-        //         fprintf(stderr, "Process with PID %d terminated.\n", pid);
-        //         kill(pid, SIGKILL);
-        //     }
-        // }
         return 1;
     }
 
