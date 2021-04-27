@@ -1,6 +1,6 @@
 # Grupo: 
 # Beatriz Matias Santana Maia: 2019107651
-# Luana: 
+# Luana Gabriele de Sousa Costa: 2018102324 
 # Sophie Dilhon Gama: 2019107591
 
 CC		:= gcc
