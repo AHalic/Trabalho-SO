@@ -79,10 +79,6 @@ void configure_signals_fg() {
 
 int quit_shell(char* command, session_list* s_list) {
     // Ve se existe a substring armageddon
-    printf("is list null?: %d\n", s_list == NULL);
-    for(session_list* aux = s_list; aux != NULL; aux = aux->next){
-        printf("group: %d\n", aux->gid);
-    }
 
     if (strstr(command, "armageddon")) {
         int group;
@@ -104,13 +100,22 @@ int destroy_zombies(char* command, pid_t group_pid){
     if (strstr(command, "liberamoita")){
          // loop nos filhos mortos
         printf("liberamoita in\n");
-        while((pid = waitpid(group_pid, &status, WNOHANG)) > -1) {
+        while((pid = waitpid(-1, &status, WNOHANG)) > -1) {
             // atualiza contador
+            if (!WIFSIGNALED(status)) {
+
+            }
             if (WIFEXITED(status) && (WEXITSTATUS(status)!= EXIT_SUCCESS)){
                 printf("pid in: %d\n", pid);
             }
         }  
         
+        // while((pid = wait(&status)) > -1) {
+        //     if(pid > 0) {
+        //         fprintf(stderr, "Process with PID %d terminated.\n", pid);
+        //         kill(pid, SIGKILL);
+        //     }
+        // }
         return 1;
     }
 
