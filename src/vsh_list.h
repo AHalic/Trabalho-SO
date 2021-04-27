@@ -1,17 +1,34 @@
 #ifndef VSH_LIST_H
 #define VSH_LIST_H
 
+// Lista de group id.
+// next: proximo item da lista
+// gid: valor do group id
 typedef struct list {
     struct list* next;
     int gid;
-} SessionList;
+} session_list;
 
-SessionList* init_empty_gid_list();
+/**
+ * Inicializa uma lista vazia
+ * 
+ * @return NULL
+ */ 
+session_list* init_empty_gid_list();
 
-SessionList* init_gid_list(int gid);
+/**
+ * Adiciona gid para lista.
+ * @param {session_list* s_list} Lista de gid.
+ * @param {int gid} Valor de gid.
+ * 
+ * @return lista com gid adicionado.
+ */
+session_list* add_gid(session_list* s_list, int gid);
 
-SessionList* add_gid(SessionList* s_list, int gid);
-
-void destroy_list(SessionList* s_list);
+/**
+ * Libera memoria alocada por lista.
+ * @param {session_list* s_list} Lista de gid.
+ */
+void destroy_list(session_list* s_list);
 
 #endif
