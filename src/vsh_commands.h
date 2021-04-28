@@ -4,14 +4,10 @@
 #include <sys/types.h>
 #include "vsh_list.h"
 
-void configure_signals_vsh();
 
-void configure_signals_vsh_sigusr();
-
-void configure_signals_fg();
-
-void configure_signals_vsh_ignore();
-
+/**
+ * 
+**/ 
 int quit_shell(char* command, session_list* s_list);
 
 int destroy_zombies(char* command, pid_t _pid);
