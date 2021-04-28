@@ -44,15 +44,13 @@ int main(int argc, char* argv[]) {
 
         // executa os programas/processos e obtem o gid da sessao
         session = execute_programs(n_commands, commands_vector);
-        gid_list = add_gid(gid_list, session);
+        
+        // adiciona pid da sessao
+        if (n_commands > 1)
+            gid_list = add_gid(gid_list, session);
 
         // reconfigura os sinais SIGINT, SIGQUIT, SIGTSTP para default
         configure_signals_vsh();
-
-        // libera zombies criados em processos bg
-        // if (n_commands > 1) {
-        //     destroy_zombies("liberamoita", 1);
-        // }
         
         // libera o vetor de comandos
         destroy_commands(commands_vector, n_commands);
