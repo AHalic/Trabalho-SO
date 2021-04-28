@@ -18,7 +18,7 @@ void handle_sigusr_vsh() {
 }
 
 void configure_signals_vsh() {
-    struct sigaction sa_dft;
+    struct sigaction sa_dft = {0};
     sa_dft.sa_flags =  SA_RESTART;
     sa_dft.sa_handler = SIG_DFL;
 
@@ -28,7 +28,7 @@ void configure_signals_vsh() {
 }
 
 void configure_signals_vsh_sigusr() {
-    struct sigaction block_signal;
+    struct sigaction block_signal = {0};
     sigset_t mask;
 
     sigemptyset(&mask);
@@ -45,7 +45,7 @@ void configure_signals_vsh_sigusr() {
 }
 
 void configure_signals_vsh_ignore() {  
-    struct sigaction sa_ign;
+    struct sigaction sa_ign = {0};
     sa_ign.sa_flags = SA_RESTART;
     sa_ign.sa_handler = SIG_IGN;
 
@@ -55,7 +55,7 @@ void configure_signals_vsh_ignore() {
 }
 
 void configure_signals_fg() {
-    struct sigaction sa_dft, sa_sigusr;
+    struct sigaction sa_dft = {0}, sa_sigusr = {0};
     sa_dft.sa_flags =  sa_sigusr.sa_flags = SA_RESTART;
 
     sa_dft.sa_handler = SIG_DFL;
@@ -65,7 +65,7 @@ void configure_signals_fg() {
     sigaction(SIGQUIT, &sa_dft, NULL);
     sigaction(SIGTSTP, &sa_dft, NULL);
 
-    struct sigaction block_signal;
+    struct sigaction block_signal = {0};
     sigset_t mask;
 
     sigemptyset(&mask);
