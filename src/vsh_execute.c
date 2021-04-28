@@ -66,14 +66,14 @@ static int execute_command_child_bg(char* exec, char** argv, int pos, int n_com,
             close_pipe(n_com, fd, n_com, 0);   // fecha os pipes que nao vao ser utilizados para leitura
 
             if(dup(fd[0][1]) == -1) return error_dup();      // para escrever no pipe 
-            close(fd[0][1]);                      // fecha pipe usada
+            close(fd[0][1]);                   // fecha pipe usada
         }
         else if (pos == n_com) {               // se for o ultimo comando, lê pipe, escreve stdout
             close(0);                          // fecha stdin
             close_pipe(n_com, fd, n_com, 1);   // fecha os pipes que nao vao ser utilizados para escrita
             close_pipe(n_com, fd, pos-1, 0);   // fecha os pipes que nao vao ser utilizados para leitura
             if(dup(fd[pos-1][0]) == -1) return error_dup();  // para ler do ultimo pipe
-            close(fd[pos-1][0]);                  // fecha pipe usada
+            close(fd[pos-1][0]);               // fecha pipe usada
         }
         else {                                 // caso nao for nem o primeiro nem o ultimo comando, lê e escreve em pipes
             close(0);                          // fecha stdin
@@ -82,8 +82,8 @@ static int execute_command_child_bg(char* exec, char** argv, int pos, int n_com,
             close_pipe(n_com, fd, pos-1, 0);   // fecha os pipes que nao vao ser utilizados para leitura
             if(dup(fd[pos-1][0]) == -1) return error_dup();      // para ler do pipe pos - 1
             if(dup(fd[pos][1]) == -1) return error_dup();        // para escrever no pipe pos
-            close(fd[pos-1][0]);                  // fecha pipe usada
-            close(fd[pos][1]);                    // fecha pipe usada
+            close(fd[pos-1][0]);               // fecha pipe usada
+            close(fd[pos][1]);                 // fecha pipe usada
         }
         
         // executa comando
@@ -103,7 +103,7 @@ int execute_command(char* command, int bg, int fd[bg][2], int pos) {
     char* exec = strdup(token);
     char* argv[4];
     
-    argv[0] = exec;                      // primeiro argumento eh o executavel
+    argv[0] = exec; // primeiro argumento eh o executavel
 
     // ler e separa argumentos
     int i = 1; 
@@ -117,8 +117,7 @@ int execute_command(char* command, int bg, int fd[bg][2], int pos) {
         }   
     }
 
-    // ultimo comando eh NULL
-    argv[i] = NULL;
+    argv[i] = NULL;  // ultimo comando eh NULL
 
     // executa programas e recebe seu pid
     pid_t pid;
@@ -190,11 +189,11 @@ int execute_programs(int n_commands, char** commands_vector) {
 
             configure_signals_fg();
             pid_t pid = execute_command(commands_vector[0], n_commands-1, NULL, 0);
-            exit(pid); // termina processo auxiliar
+            exit(0); // termina processo auxiliar
         }
 
         exit(0);
     }
 
-    return command_line;
+    return command_line;    // retorna pid do fork (que eh usado como gid de background)
 }
