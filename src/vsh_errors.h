@@ -20,4 +20,16 @@ int error_pipe();
 **/
 int error_fork();
 
+/**
+ * Função que imprime o erro gerado pela função dup
+ * @return valor de erro {104}
+**/
+int error_dup();
+
+/**
+ * Função que imprime o erro gerado pela função setsid
+ * @return valor de erro {105}
+**/
+int error_setsid();
+
 #endif

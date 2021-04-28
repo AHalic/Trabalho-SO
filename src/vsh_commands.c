@@ -21,6 +21,7 @@ int quit_shell(char* command, session_list* s_list) {
         int group;
         for(session_list* aux = s_list; aux != NULL; aux = aux->next){
             group = aux->gid * -1;
+            printf("gid %d\n", group);
             kill(group, SIGKILL);
         }
         return 1;
@@ -32,11 +33,10 @@ int quit_shell(char* command, session_list* s_list) {
 int destroy_zombies(char* command, pid_t group_pid){
     int status;
     pid_t pid;
-    group_pid *= -1;
+    group_pid *= -1; // TODO: isso não é usado
 
     if (strstr(command, "liberamoita")){
-        while((pid = waitpid(-1, &status, WNOHANG)) > -1) {
-        }  
+        while((pid = waitpid(-1, &status, WNOHANG)) > -1);
         
         return 1;
     }

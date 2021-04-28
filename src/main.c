@@ -35,7 +35,9 @@ int main(int argc, char* argv[]) {
             }
             if(quit_shell(commands_vector[0], gid_list)) {
                 destroy_list(gid_list);
-                free(commands_vector);
+                // free(commands_vector); 
+                // TODO: talvez seja isso o leak?
+                destroy_commands(commands_vector, 1);
                 break;
             }
         }

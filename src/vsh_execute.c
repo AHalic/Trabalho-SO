@@ -23,16 +23,17 @@
  * @return Numero do processo do filho.
  */
 static int execute_command_child_fg (char* exec, char** argv) {
-    int pid = fork();                    // fork para executar o comando em outro processo
+    int pid;
+    if((pid = fork()) == -1) return error_fork(); // fork para executar o comando em outro processo
 
-    if(!pid)                             // se for o filho, rode o comando
+    if(!pid)                                      // se for o filho, rode o comando
         if(execvp(exec, argv) == -1){
             int error = error_execvp();
             exit(error);
         }
 
     int wstatus;
-    waitpid(pid, &wstatus, WUNTRACED);   // espera o filho terminar para continuar 
+    waitpid(pid, &wstatus, WUNTRACED);            // espera o filho terminar para continuar 
 
     return pid;
 }
@@ -52,33 +53,33 @@ static int execute_command_child_fg (char* exec, char** argv) {
  * @return Numero do processo do filho.
  */ 
 static int execute_command_child_bg(char* exec, char** argv, int pos, int n_com, int fd[n_com][2]){
-    // fork para executar o comando em outro processo
-    int pid = fork();
-    
+    int pid;
+    if((pid = fork()) == -1) return error_fork(); // fork para executar o comando em outro processo
+
     // fd[n_com][0] = leitura
     // fd[n_com][1] = escrita
 
     if(!pid) {
-        // TODO: dar close nos pipes n usados
-        if (!pos) {                            // se for o primeiro comando. Primeiro comando ler stdin.
-            close(1);                          // fecha escrita 
+        if (!pos) {                            // se for o primeiro comando, lê stdin, escreve pipe
+            close(1);                          // fecha stdout
             close_pipe(n_com, fd, 0, 1);       // fecha os pipes que nao vao ser utilizados para escrita
             close_pipe(n_com, fd, n_com, 0);   // fecha os pipes que nao vao ser utilizados para leitura
-            dup(fd[0][1]);                     // escreve no pipe 
+
+            if(dup(fd[0][1]) == -1) return error_dup();      // para escrever no pipe 
         }
-        else if (pos == n_com) {               // se for o ultimo comando. Ultimo comando escreve no stdout
-            close(0);                          // fecha leitura
+        else if (pos == n_com) {               // se for o ultimo comando, lê pipe, escreve stdout
+            close(0);                          // fecha stdin
             close_pipe(n_com, fd, n_com, 1);   // fecha os pipes que nao vao ser utilizados para escrita
             close_pipe(n_com, fd, pos-1, 0);   // fecha os pipes que nao vao ser utilizados para leitura
-            dup(fd[pos-1][0]);                 // ler do ultimo pipe
+            if(dup(fd[pos-1][0]) == -1) return error_dup();  // para ler do ultimo pipe
         }
-        else {                                 // caso nao for nem o primeiro nem o ultimo comando. Ler e escreve em pipes
-            close(0);                          // fecha leitura
-            close(1);                          // fecha escrita
+        else {                                 // caso nao for nem o primeiro nem o ultimo comando, lê e escreve em pipes
+            close(0);                          // fecha stdin
+            close(1);                          // fecha stdout
             close_pipe(n_com, fd, pos, 1);     // fecha os pipes que nao vao ser utilizados para escrita
             close_pipe(n_com, fd, pos-1, 0);   // fecha os pipes que nao vao ser utilizados para leitura
-            dup(fd[pos-1][0]);                 // ler do pipe pos - 1
-            dup(fd[pos][1]);                   // escreve no pipe pos
+            if(dup(fd[pos-1][0]) == -1) return error_dup();      // para ler do pipe pos - 1
+            if(dup(fd[pos][1]) == -1) return error_dup();        // para escrever no pipe pos
         }
         
         // executa comando
@@ -130,17 +131,21 @@ int execute_programs(int n_commands, char** commands_vector) {
     pid_t command_line;
     if ((command_line = fork()) == -1) return error_fork();
 
-    // background
     if(command_line && n_commands == 1) {
+        // Caso seja a vsh e foi inserido apenas um processo na linha de comandos
+
         configure_signals_vsh_ignore();
         int status = 0;
         // espera o processo auxiliar terminar
         pid_t pid = waitpid(command_line, &status, WUNTRACED);
     }
-    // foreground
     else if (!command_line) {
+        // Caso seja o processo auxiliar
+
         if (n_commands > 1) {
-            pid_t group = setsid(); 
+            // Caso tenha mais de um comando (rodam em background)
+            pid_t group;
+            if((group = setsid()) == -1) return error_setsid(); 
 
             sigset_t mask;
             sigemptyset(&mask);
@@ -176,68 +181,8 @@ int execute_programs(int n_commands, char** commands_vector) {
             exit(0); // termina processo auxiliar
         } 
         else if (n_commands == 1){
-            configure_signals_fg();
-            pid_t pid = execute_command(commands_vector[0], n_commands-1, NULL, 0);
-            exit(pid); // termina processo auxiliar
-        }
+            // Caso tenha apenas um comando (roda em foreground)
 
-        exit(0);
-    }
-
-    return command_line;
-}
-
-int execute_programs_teste(int n_commands, char** commands_vector) {
-    pid_t command_line;
-    // faz um fork para auxiliar com a criação dos processos da linha de comando
-    if ((command_line = fork()) == -1) return error_fork();
-
-    // background
-    if(command_line && n_commands == 1) {
-        configure_signals_vsh_ignore();
-        int status = 0;
-        // espera o processo auxiliar terminar
-        pid_t pid = waitpid(command_line * -1, &status, WUNTRACED);
-    }
-    else if (!command_line) {
-        if (n_commands > 1) {
-            // cria uma nova sessao
-            pid_t group = setsid(); 
-
-            sigset_t mask;
-            sigemptyset(&mask);
-            sigaddset(&mask, SIGINT);
-            sigaddset(&mask, SIGQUIT);
-            sigaddset(&mask, SIGTSTP);
-
-            pid_t pids[n_commands];        // usado pra guardar o pid dos filhos
-            pid_t pid;                     // aux pra pegar o pid
-            int status;                    // ver o status do pai com os filhos
-            int signaledUsr = 0;           // ver se foi sinalizado SIGUSR1 pro pai
-            int fd[n_commands - 1][2];     // vetor de pipes
-
-            open_pipe(n_commands, fd);
-            for (int i = 0; i < n_commands; i++) {
-                // executa programas e retorna pid
-                pids[i] = execute_command(commands_vector[i], n_commands-1, fd, i);   
-            }
-        
-            close_pipe(n_commands-1, fd, n_commands, 0);
-            close_pipe(n_commands-1, fd, n_commands, 1); 
-
-            // verifica estado dos filhos
-            while ((pid = waitpid(0, &status, WNOHANG)) > -1) {
-                if (WIFSIGNALED(status)) {
-                    // se filho terminou com SIGUSR1, mata todos os filhos
-                    if (WTERMSIG(status) == SIGUSR1 || WTERMSIG(status) == SIGUSR2) {
-                        kill(group * -1, SIGKILL);
-                    }
-                }
-            }
-
-            exit(0); // termina processo auxiliar
-        } 
-        else if (n_commands == 1){
             configure_signals_fg();
             pid_t pid = execute_command(commands_vector[0], n_commands-1, NULL, 0);
             exit(pid); // termina processo auxiliar
