@@ -64,7 +64,6 @@ static int execute_command_child_bg(char* exec, char** argv, int pos, int n_com,
             close(1);                          // fecha stdout
             close_pipe(n_com, fd, 0, 1);       // fecha os pipes que nao vao ser utilizados para escrita
             close_pipe(n_com, fd, n_com, 0);   // fecha os pipes que nao vao ser utilizados para leitura
-
             if(dup(fd[0][1]) == -1) return error_dup();      // para escrever no pipe 
             close(fd[0][1]);                   // fecha pipe usada
         }
@@ -150,12 +149,6 @@ int execute_programs(int n_commands, char** commands_vector) {
             // Caso tenha mais de um comando (rodam em background)
             pid_t group;
             if((group = setsid()) == -1) return error_setsid(); 
-
-            sigset_t mask;
-            sigemptyset(&mask);
-            sigaddset(&mask, SIGINT);
-            sigaddset(&mask, SIGQUIT);
-            sigaddset(&mask, SIGTSTP);
 
             pid_t pids[n_commands];        // usado pra guardar o pid dos filhos
             pid_t pid;                     // aux pra pegar o pid
