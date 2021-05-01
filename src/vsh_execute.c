@@ -17,8 +17,8 @@
  * Para executar um comando (processo) em foreground, a shell precisa criar um processo auxiliar (um filho)
  * para poder executar a funcao execvp(). Por ser um processo que deve rodar em foreground, eh preciso esperar 
  * o processo auxiliar terminar. A função deve retornar o pid do processo filho criado.
- * @param {char* exec}  String do comando que sera executado.
- * @param {char** argv} Vetor de strings em que cada string eh um argumento. argv[0] deve ser o exec.
+ * @param {char*}exec  String do comando que sera executado.
+ * @param {char**}argv Vetor de strings em que cada string eh um argumento. argv[0] deve ser o exec.
  * 
  * @return Numero do processo do filho.
  */
@@ -43,12 +43,12 @@ static int execute_command_child_fg (char* exec, char** argv) {
  * determinar uma nova sessao de grupo. A saida de um processo, eh a entrada do processo seguinte. Para 
  * isso eh utilizado a funcao dup(). A funcao deve retornar o pid do processo criado. 
  * 
- * @param {char* exec}  String do comando que deve ser executado.
- * @param {char** argv} Vetor de strings em que cada string eh um argumento. argv[0] deve ser o exec.
- * @param {int pos}     Posicao do comando na linha do terminal, iniciando do 0. Ex.: Em "ps1 | ps2 | ps3", 
+ * @param {char*}exec  String do comando que deve ser executado.
+ * @param {char**}argv Vetor de strings em que cada string eh um argumento. argv[0] deve ser o exec.
+ * @param {int}pos     Posicao do comando na linha do terminal, iniciando do 0. Ex.: Em "ps1 | ps2 | ps3", 
  *                      ps2 tem pos 1.
- * @param {int n_com}   Numero de comandos na linha do terminal.
- * @param {int fd[][2]} Matriz de pipes.
+ * @param {int}n_com   Numero de comandos na linha do terminal.
+ * @param {int}fd[][2] Matriz de pipes.
  * 
  * @return Numero do processo do filho.
  */ 
