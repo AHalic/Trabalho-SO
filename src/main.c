@@ -11,6 +11,8 @@
 #define true 1
 
 int main(int argc, char* argv[]) {
+    system("clear"); 
+
     // configura a mascara de sinais para os SIGUSRs
     configure_signals_vsh_sigusr();
 
