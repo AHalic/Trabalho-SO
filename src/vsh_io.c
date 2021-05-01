@@ -9,7 +9,7 @@
 #include "vsh_commands.h"
 
 void show_command_line() {
-    printf("vsh > ");
+    printf("vsh> ");
 }
 
 /**
@@ -103,7 +103,7 @@ void close_pipe(int n_command, int fd[n_command][2], int not, int rdwt) {
     }
 }
 
-void open_pipe(int n_commands, int fd[n_commands][2]) {
+void open_pipe(int n_commands, int fd[n_commands-1][2]) {
     if (n_commands > 1) {
         for (int i = 0; i < n_commands - 1; i++) {
             // se deu erro com abertura de pipe

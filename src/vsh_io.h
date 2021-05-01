@@ -29,6 +29,6 @@ void close_pipe(int n_command, int fd[n_command][2], int not, int rdwt);
  * @param {int n_commands} Quantidade de comandos na linha - 1.
  * @param {int fg[n_commands][2]} Matriz para pipes inicializada no formato [n_commands][2]. 
  */
-void open_pipe(int n_commands, int fd[n_commands][2]);
+void open_pipe(int n_commands, int fd[n_commands-1][2]);
 
 #endif
