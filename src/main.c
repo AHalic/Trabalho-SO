@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include "vsh_io.h"
 #include "vsh_handler.h"
 #include "vsh_commands.h"
@@ -44,7 +45,8 @@ int main(int argc, char* argv[]) {
 
         // executa os programas/processos e obtem o gid da sessao
         session = execute_programs(n_commands, commands_vector);
-        
+        usleep(1000);
+
         // adiciona pid da sessao
         if (n_commands > 1)
             gid_list = add_gid(gid_list, session);
