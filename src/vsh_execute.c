@@ -100,7 +100,7 @@ static int execute_command_child_bg(char* exec, char** argv, int pos, int n_com,
 int execute_command(char* command, int bg, int fd[bg][2], int pos) {
     char* token = strtok(command, " ");
     char* exec = strdup(token);
-    char* argv[4];
+    char* argv[5];
     
     argv[0] = exec; // primeiro argumento eh o executavel
 
