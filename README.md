@@ -17,11 +17,11 @@ Caso queira rodar o programa sem o uso do valgrind, é possível utilizar ```mak
 
 Os processos podem ser ou em background ou em foregroud. Cada processo pode receber até 3 argumentos. Para rodar um programa em foreground é preciso escrever na linha de comando o nome do programa, sem uso de caracteres especiais, da seguinte forma:
 
-ex.: "./exec arg1 arg2 arg3"
+```ex.: "./exec arg1 arg2 arg3"```
 
 Para executar processos em background é preciso utilizar o caracter especial " | " para separar os comandos diferentes, na seguinte forma:
 
-ex. " prog1 | prog2"
+```ex. " prog1 | prog2"```
 
 A saída de um processo é a entrada do processo seguinte. O primeiro processo recebe a entrada em stdin e o último processo imprime no stdout.
 
@@ -34,7 +34,7 @@ A Vaccine Shell possui dois comandos especiais:
 
 ### armageddon
 
-O comando armageddon é utilizado para terminar a execução da shell. Caso ela esteja executando alguns comandos em background, ele termina os outros processos antes de terminar a shell. Para usar o armageddon, precisa utilizar a função "quit_shell".
+O comando armageddon é utilizado para terminar a execução da shell. Caso ela esteja executando alguns comandos em background, estes são terminados antes de encerrar a shell. Para usar o armageddon, é utilizada a função "quit_shell".
 
 ### liberamoita
 
@@ -60,11 +60,11 @@ Na biblioteca "vsh_commands", há 3 funções referentes a comandos internos da 
 - destroy_zombies
 - destroy_commands
 
-Atráves de *quit_shell* é possível fechar a shell e todos os processos que estavam sendo executados.
+Atráves de ```quit_shell``` é possível fechar a shell e todos os processos que estavam sendo executados.
 
-A função *destroy_zombie* libera os processo zombies.
+A função ```destroy_zombie``` libera os processo zombies.
 
-A função *destroy_commands* libera a memória alocada para armazenar as strings referente a linha de comando.
+A função ```destroy_commands``` libera a memória alocada para armazenar as strings referente a linha de comando.
 
 ### vsh errors
 
@@ -83,7 +83,7 @@ A biblioteca "vsh_execute" é referente as funções utilizadas para execução 
 - execute_command
 - execute_programs
 
-A função *execute_programs* é responsável para a execução de todos os processo informados na linha de comando. A função *execute_command*, utilizada dentro da função anterior, execute apenas um processo, sendo ele background ou foregroud.
+A função ```execute_programs``` é responsável para a execução de todos os processo informados na linha de comando. A função ```execute_command```, utilizada dentro da função anterior, execute apenas um processo, sendo ele background ou foregroud.
 
 ### vsh handler
 
@@ -95,7 +95,7 @@ A biblioteca "vsh_handler" é responsavél pelas funções tratadoras de sinais,
 - configure_signals_vsh_ignore
 - configure_signals_fg
 
-A função *handle_sigusr_vsh* apresenta a mensagem seguinte quando recebe SIGUSR1 ou SIGUSR2:
+A função ```handle_sigusr_vsh``` apresenta a mensagem seguinte quando recebe SIGUSR1 ou SIGUSR2:
 
 ```
     _ _      (0)(0)-._  _.-'^^'^^'^^'^^'^^'--.
@@ -107,7 +107,7 @@ A função *handle_sigusr_vsh* apresenta a mensagem seguinte quando recebe SIGUS
 I feel weird...
 ```
 
-As funções *configure* são para configurar os tratadores da shell e dos processos foreground. O *configure_signals_vsh_sigusr* é responsável para configurar a função de tratamento do SIGUSR1 e SIGUSR2 para a shell. O *configure_signals_vsh* faça com que SIGINT, SIGQUIT e SIGTSTP receba os tratadores de sinais padrões. O *configure_signals_vsh_ignore* faça com que SIGINT, SIGQUIT e SIGTSTP seja ignorado para shell. O *configure_signals_fg* faça com que para os processos foregrounds trate SIGINT, SIGQUIT e SIGTSTP com os tratadores padrões. 
+As funções ```configure``` são para configurar os tratadores da shell e dos processos foreground. O ```configure_signals_vsh_sigusr``` é responsável para configurar a função de tratamento do SIGUSR1 e SIGUSR2 para a shell. O ```configure_signals_vsh``` faça com que SIGINT, SIGQUIT e SIGTSTP receba os tratadores de sinais padrões. O ```configure_signals_vsh_ignore``` faça com que SIGINT, SIGQUIT e SIGTSTP seja ignorado para shell. O ```configure_signals_fg``` faça com que para os processos foregrounds trate SIGINT, SIGQUIT e SIGTSTP com os tratadores padrões. 
 
 ### vsh io
 
@@ -118,7 +118,7 @@ A biblioteca "vsh_io" é responsavél pelas funções referente a entrada e saí
 - close_pipe
 - open_pipe
 
-A função *show_command_line* é responsável pela impressão de "vsh > ". A função *read_command_line* é responsável pela leitura da linha de comando e o tratamento da string lida. A função *close_pipe* fecha os pipes (exceto por o indicado) e a função *open_pipe* abre todos os pipes da matriz de pipe. 
+A função ```show_command_line``` é responsável pela impressão de "vsh > ". A função ```read_command_line``` é responsável pela leitura da linha de comando e o tratamento da string lida. A função ```close_pipe``` fecha os pipes (exceto por o indicado) e a função ```open_pipe``` abre todos os pipes da matriz de pipe. 
 
 ## vsh list
 
