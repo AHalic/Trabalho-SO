@@ -23,7 +23,7 @@ int quit_shell(char* command, session_list* s_list);
  * @param {pid_t}group_pid
  * @return 1 se o comando é liberamoita, 0 se não
 **/ 
-int destroy_zombies(char* command, pid_t group_pid);
+int destroy_zombies(char* command);
 
 /**
  * Destrói os comandos alocados

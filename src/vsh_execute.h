@@ -13,7 +13,6 @@
  */
 int execute_command(char* command, int bg, int fd[bg][2], int pos);
 
-
 /**
  * Executa todos os processos dado um numero de comando e um vetor de string. 
  * @param {int}n_commands Quandtidade de numero de comandos que devem ser executados;

@@ -1,7 +1,6 @@
 #ifndef VSH_ERRORS_H
 #define VSH_ERRORS_H
 
-
 /**
  * Função que imprime o erro gerado pela função execvp
  * @return valor de erro {101}

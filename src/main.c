@@ -32,14 +32,12 @@ int main(int argc, char* argv[]) {
 
         // se tiver apenas 1 comando, verificar se sao comandos da shell
         if(n_commands == 1){
-            if(destroy_zombies(commands_vector[0], 1)) {
+            if(destroy_zombies(commands_vector[0])) {
                 destroy_commands(commands_vector, 1);
                 continue;
             }
             if(quit_shell(commands_vector[0], gid_list)) {
                 destroy_list(gid_list);
-                // free(commands_vector); 
-                // TODO: talvez seja isso o leak?
                 destroy_commands(commands_vector, 1);
                 break;
             }
@@ -47,6 +45,7 @@ int main(int argc, char* argv[]) {
 
         // executa os programas/processos e obtem o gid da sessao
         session = execute_programs(n_commands, commands_vector);
+        // para impressao do prompt apos a execucao de um processo
         usleep(1000);
 
         // adiciona pid da sessao

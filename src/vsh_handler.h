@@ -1,7 +1,6 @@
 #ifndef VSH_HANDLER_H
 #define VSH_HANDLER_H
 
-
 /**
  * Função que trata o sinal SIGUSR1 e 
  * SIGUSR2 recebido pela vsh
@@ -39,6 +38,5 @@ void configure_signals_fg();
  * são tratados, todos são ignorados
 **/
 void configure_signals_vsh_ignore();
-
 
 #endif

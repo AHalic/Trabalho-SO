@@ -80,4 +80,3 @@ void configure_signals_fg() {
     sigaction(SIGUSR1, &block_signal, NULL);
     sigaction(SIGUSR2, &block_signal, NULL);
 }
-
